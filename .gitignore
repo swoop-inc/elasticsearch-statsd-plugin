@@ -1,6 +1,8 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
+# ignore this
+target/
+.settings/
+.metadata/
+data/
+.classpath
+.project
+*.swp
