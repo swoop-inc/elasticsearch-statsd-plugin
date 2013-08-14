@@ -4,11 +4,20 @@ import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.component.LifecycleComponent;
 import org.elasticsearch.plugins.AbstractPlugin;
 import org.elasticsearch.service.statsd.StatsdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 public class StatsdPlugin extends AbstractPlugin {
 
+	protected final Logger	log	= LoggerFactory.getLogger(this.getClass());
+	
+	public StatsdPlugin()
+	{
+		log.info("Instantiating StatsdPlugin");
+	}
+	
     public String name() {
         return "statsd";
     }
