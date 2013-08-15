@@ -7,22 +7,25 @@ import org.elasticsearch.node.NodeBuilder;
 
 import java.io.IOException;
 
-public class NodeTestHelper {
+public class NodeTestHelper
+{
 
-    public static Node createNode(String clusterName, final int numberOfShards, int statsdPort, String refreshInterval) throws IOException {
-        ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
+	public static Node createNode(String clusterName, final int numberOfShards, int statsdPort, String refreshInterval)
+		throws IOException
+	{
+		ImmutableSettings.Builder settingsBuilder = ImmutableSettings.settingsBuilder();
 
-        settingsBuilder.put("gateway.type", "none");
-        settingsBuilder.put("cluster.name", clusterName);
-        settingsBuilder.put("index.number_of_shards", numberOfShards);
-        settingsBuilder.put("index.number_of_replicas", 1);
+		settingsBuilder.put("gateway.type", "none");
+		settingsBuilder.put("cluster.name", clusterName);
+		settingsBuilder.put("index.number_of_shards", numberOfShards);
+		settingsBuilder.put("index.number_of_replicas", 1);
 
-        settingsBuilder.put("metrics.statsd.host", "localhost");
-        settingsBuilder.put("metrics.statsd.port", statsdPort);
-        settingsBuilder.put("metrics.statsd.every", refreshInterval);
+		settingsBuilder.put("metrics.statsd.host", "localhost");
+		settingsBuilder.put("metrics.statsd.port", statsdPort);
+		settingsBuilder.put("metrics.statsd.every", refreshInterval);
 
-        LogConfigurator.configure(settingsBuilder.build());
+		LogConfigurator.configure(settingsBuilder.build());
 
-        return NodeBuilder.nodeBuilder().settings(settingsBuilder.build()).node();
-    }
+		return NodeBuilder.nodeBuilder().settings(settingsBuilder.build()).node();
+	}
 }
