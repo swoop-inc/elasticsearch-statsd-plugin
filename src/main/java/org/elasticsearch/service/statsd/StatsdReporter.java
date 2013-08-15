@@ -351,28 +351,6 @@ public class StatsdReporter {
     	sendGauge(name, "memorySizeInBytes", filterCache.getMemorySizeInBytes());
     	sendGauge(name, "evictions", filterCache.getEvictions());
     }
-
-//    protected void sendToGraphite(String name, String value) {
-//        try {
-//            writer.write(sanitizeString(name));
-//            writer.write('.');
-//            writer.write(value);
-//            writer.write(' ');
-//            writer.write(Long.toString(timestamp));
-//            writer.write('\n');
-//            writer.flush();
-//        } catch (IOException e) {
-//            logger.error("Error sending to Graphite:", e);
-//        }
-//    }
-
-//    protected void sendInt(String name, String valueName, long value) {
-//        sendToGraphite(name, valueName + " " + String.format("%d", value));
-//    }
-//
-//    protected void sendFloat(String name, String valueName, double value) {
-//        sendToGraphite(name, valueName + " " + String.format("%2.2f", value));
-//    }
     
     protected void sendGauge(String name, String valueName, long value) {
     	statsdClient.gauge(join(name, valueName), (int) value);

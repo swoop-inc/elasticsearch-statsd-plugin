@@ -1,8 +1,8 @@
 rootLogger: INFO, console
 
 logger:
-  service.graphite: DEBUG
-  plugin.graphite.GraphitePlugin: DEBUG
+  service.statsd: DEBUG
+  plugin.statsd.StatsdPlugin: DEBUG
 
 appender:
   console:

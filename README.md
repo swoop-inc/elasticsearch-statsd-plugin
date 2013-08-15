@@ -13,7 +13,7 @@ As plugins (except site plugins) cannot be automatically installed from github c
 git clone http://github.com/swoop-inc/elasticsearch-statsd-plugin.git
 cd elasticsearch-statsd-plugin
 mvn package
-/path/to/elasticsearch/bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-graphite-0.1-SNAPSHOT.zip
+/path/to/elasticsearch/bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-0.2-SNAPSHOT.zip
 ```
 
 
