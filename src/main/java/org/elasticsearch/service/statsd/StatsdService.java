@@ -1,5 +1,8 @@
 package org.elasticsearch.service.statsd;
 
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
+
 import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.action.admin.indices.stats.CommonStatsFlags;
@@ -30,6 +33,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService>
 	private final Integer			statsdPort;
 	private final TimeValue			statsdRefreshInternal;
 	private final String			statsdPrefix;
+	private final StatsDClient		statsdClient;
 
 	private volatile Thread			statsdReporterThread;
 	private volatile boolean		closed;
@@ -42,10 +46,11 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService>
 		this.clusterService = clusterService;
 		this.indicesService = indicesService;
 		this.nodeService = nodeService;
-		statsdRefreshInternal = settings.getAsTime("metrics.statsd.every", TimeValue.timeValueMinutes(1));
-		statsdHost = settings.get("metrics.statsd.host");
-		statsdPort = settings.getAsInt("metrics.statsd.port", 2003);
-		statsdPrefix = settings.get("metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name"));
+		this.statsdRefreshInternal = settings.getAsTime("metrics.statsd.every", TimeValue.timeValueMinutes(1));
+		this.statsdHost = settings.get("metrics.statsd.host");
+		this.statsdPort = settings.getAsInt("metrics.statsd.port", 2003);
+		this.statsdPrefix = settings.get("metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name"));
+		this.statsdClient = new NonBlockingStatsDClient(statsdPrefix, statsdHost, statsdPort);
 	}
 
 	@Override
@@ -96,8 +101,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService>
 					NodeStats nodeStats = nodeService.stats(commonStatsFlags, true, true, true, true, true, true, true, true);
 					List<IndexShard> indexShards = getIndexShards(indicesService);
 
-					StatsdReporter statsdReporter = new StatsdReporter(statsdHost, statsdPort, statsdPrefix, nodeIndicesStats,
-							indexShards, nodeStats);
+					StatsdReporter statsdReporter = new StatsdReporter(nodeIndicesStats, indexShards, nodeStats, statsdClient);
 					statsdReporter.run();
 				}
 				else {
