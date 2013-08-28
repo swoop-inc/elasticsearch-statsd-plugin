@@ -1,6 +1,5 @@
 package org.elasticsearch.service.statsd;
 
-import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
@@ -42,14 +41,14 @@ public class StatsdReporter {
 	private final StatsDClient		statsdClient;
 	private String					joiner			= DEFAULT_JOINER;
 
-	public StatsdReporter(String host, int port, String prefix, NodeIndicesStats nodeIndicesStats,
-			List<IndexShard> indexShards, NodeStats nodeStats)
+	public StatsdReporter(NodeIndicesStats nodeIndicesStats, List<IndexShard> indexShards, NodeStats nodeStats,
+			StatsDClient statsdClient)
 	{
 
 		this.indexShards = indexShards;
 		this.nodeStats = nodeStats;
 		this.nodeIndicesStats = nodeIndicesStats;
-		this.statsdClient = new NonBlockingStatsDClient(prefix, host, port);
+		this.statsdClient = statsdClient;
 	}
 
 	public void run()
