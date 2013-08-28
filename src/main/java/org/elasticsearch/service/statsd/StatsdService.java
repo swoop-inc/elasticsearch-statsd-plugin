@@ -48,7 +48,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService>
 		this.nodeService = nodeService;
 		this.statsdRefreshInternal = settings.getAsTime("metrics.statsd.every", TimeValue.timeValueMinutes(1));
 		this.statsdHost = settings.get("metrics.statsd.host");
-		this.statsdPort = settings.getAsInt("metrics.statsd.port", 2003);
+		this.statsdPort = settings.getAsInt("metrics.statsd.port", 8125);
 		this.statsdPrefix = settings.get("metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name"));
 		this.statsdClient = new NonBlockingStatsDClient(statsdPrefix, statsdHost, statsdPort);
 	}
