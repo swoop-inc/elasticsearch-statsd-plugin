@@ -38,31 +38,41 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
     private volatile boolean closed;
 
     @Inject
-    public StatsdService(Settings settings, ClusterService clusterService, IndicesService indicesService,
-            NodeService nodeService) {
+    public StatsdService(Settings settings, ClusterService clusterService, IndicesService indicesService, NodeService nodeService) {
         super(settings);
         this.clusterService = clusterService;
         this.indicesService = indicesService;
         this.nodeService = nodeService;
-        this.statsdRefreshInternal = settings
-                .getAsTime("metrics.statsd.every", TimeValue.timeValueMinutes(1));
-        this.statsdHost = settings.get("metrics.statsd.host");
-        this.statsdPort = settings.getAsInt("metrics.statsd.port", 8125);
-        this.statsdPrefix = settings.get("metrics.statsd.prefix",
-                                         "elasticsearch" + "." + settings.get("cluster.name"));
+        this.statsdRefreshInternal = settings.getAsTime(
+            "metrics.statsd.every", TimeValue.timeValueMinutes(1)
+        );
+        this.statsdHost = settings.get(
+            "metrics.statsd.host"
+        );
+        this.statsdPort = settings.getAsInt(
+            "metrics.statsd.port", 8125
+        );
+        this.statsdPrefix = settings.get(
+            "metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name")
+        );
         this.statsdClient = new NonBlockingStatsDClient(this.statsdPrefix, this.statsdHost, this.statsdPort);
     }
 
     @Override
     protected void doStart() throws ElasticsearchException {
         if (this.statsdHost != null && this.statsdHost.length() > 0) {
-            this.statsdReporterThread = EsExecutors.daemonThreadFactory(this.settings, "statsd_reporter")
-                    .newThread(new StatsdReporterThread());
+            this.statsdReporterThread = EsExecutors
+                .daemonThreadFactory(this.settings, "statsd_reporter")
+                .newThread(new StatsdReporterThread());
             this.statsdReporterThread.start();
-            this.logger.info("Statsd reporting triggered every [{}] to host [{}:{}] with metric prefix [{}]",
-                             this.statsdRefreshInternal, this.statsdHost, this.statsdPort, this.statsdPrefix);
+            this.logger.info(
+                "StatsD reporting triggered every [{}] to host [{}:{}] with metric prefix [{}]",
+                this.statsdRefreshInternal, this.statsdHost, this.statsdPort, this.statsdPrefix
+            );
         } else {
-            this.logger.error("Statsd reporting disabled, no statsd host configured");
+            this.logger.error(
+                "StatsD reporting disabled, no statsd host configured"
+            );
         }
     }
 
@@ -75,7 +85,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
             this.statsdReporterThread.interrupt();
         }
         this.closed = true;
-        this.logger.info("Statsd reporter stopped");
+        this.logger.info("StatsD reporter stopped");
     }
 
     @Override
