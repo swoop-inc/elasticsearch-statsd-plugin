@@ -32,6 +32,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
     private final Integer statsdPort;
     private final TimeValue statsdRefreshInternal;
     private final String statsdPrefix;
+    private final Boolean statsdReportShards;
     private final StatsDClient statsdClient;
 
     private volatile Thread statsdReporterThread;
@@ -54,6 +55,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
         );
         this.statsdPrefix = settings.get(
             "metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name")
+        );
+        this.statsdReportShards = settings.getAsBoolean(
+            "metrics.statsd.report_shards", true
         );
         this.statsdClient = new NonBlockingStatsDClient(this.statsdPrefix, this.statsdHost, this.statsdPort);
     }
@@ -130,13 +134,17 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 
         private List<IndexShard> getIndexShards(IndicesService indicesService) {
             List<IndexShard> indexShards = Lists.newArrayList();
-            String[] indices = indicesService.indices().toArray(new String[] {});
-            for (String indexName : indices) {
-                IndexService indexService = indicesService.indexServiceSafe(indexName);
-                for (int shardId : indexService.shardIds()) {
-                    indexShards.add(indexService.shard(shardId));
+
+            if ( StatsdService.this.statsdReportShards ) {
+                String[] indices = indicesService.indices().toArray(new String[] {});
+                for (String indexName : indices) {
+                    IndexService indexService = indicesService.indexServiceSafe(indexName);
+                    for (int shardId : indexService.shardIds()) {
+                        indexShards.add(indexService.shard(shardId));
+                    }
                 }
             }
+
             return indexShards;
         }
     }
