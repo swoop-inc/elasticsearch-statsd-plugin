@@ -102,25 +102,42 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		public void run() {
 			while (!StatsdService.this.closed) {
 				DiscoveryNode node = StatsdService.this.clusterService.localNode();
-				boolean isClusterStarted = StatsdService.this.clusterService.lifecycleState()
-						.equals(Lifecycle.State.STARTED);
+				boolean isClusterStarted = StatsdService.this.clusterService
+					.lifecycleState()
+					.equals(Lifecycle.State.STARTED);
 
-				if (isClusterStarted && node != null && node.isMasterNode()) {
-					NodeIndicesStats nodeIndicesStats = StatsdService.this.indicesService.stats(false);
-					CommonStatsFlags commonStatsFlags = new CommonStatsFlags().clear();
-					NodeStats nodeStats = StatsdService.this.nodeService.stats(commonStatsFlags, true, true,
-																			   true, true, true, true, true,
-																			   true, false);
-					List<IndexShard> indexShards = this.getIndexShards(StatsdService.this.indicesService);
+				if (node != null && isClusterStarted) {
+					// Master Node sends cluster wide stats
+					if (node.isMasterNode()) {
+						NodeIndicesStats nodeIndicesStats = StatsdService.this.indicesService.stats(
+							false // includePrevious
+						);
+						NodeStats nodeStats = StatsdService.this.nodeService.stats(
+							new CommonStatsFlags().clear(), // indices
+							true, // os
+							true, // process
+							true, // jvm
+							true, // threadPool
+							true, // network
+							true, // fs
+							true, // transport
+							true, // http
+							false // circuitBreaker
+						);
+						List<IndexShard> indexShards = this.getIndexShards(StatsdService.this.indicesService);
 
-					StatsdReporter statsdReporter = new StatsdReporter(nodeIndicesStats, indexShards,
-							nodeStats, StatsdService.this.statsdClient);
-					statsdReporter.run();
-				} else {
-					if (node != null) {
-						StatsdService.this.logger
-								.debug("[{}]/[{}] is not master node, not triggering update", node.getId(),
-									   node.getName());
+						StatsdReporter statsdReporter = new StatsdReporter(
+							nodeIndicesStats,
+							indexShards,
+							nodeStats,
+							StatsdService.this.statsdClient
+						);
+						statsdReporter.run();
+					} else {
+						StatsdService.this.logger.debug(
+							"[{}]/[{}] is not master node, not triggering update",
+							node.getId(), node.getName()
+						);
 					}
 				}
 
