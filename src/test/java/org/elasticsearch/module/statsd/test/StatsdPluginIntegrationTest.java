@@ -53,7 +53,7 @@ public class StatsdPluginIntegrationTest
 		ensureValidKeyNames();
 		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing._all.indexCount:1|c");
 		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing." + type + ".indexCount:1|c");
-		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".node.jvm.threads.peakCount:");
+		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".node.jvm.threads.peak_count:");
 	}
 
 	@Test
