@@ -195,13 +195,13 @@ public class StatsdReporter {
 
 		// garbage collectors
 		long gcCounter = 0;
-        long gcTimes = 0;
-        for (GarbageCollector gc : jvmStats.gc()) {
-            gcCounter += gc.collectionCount();
-            gcTimes += gc.collectionTime().getSeconds();
-        }
-        this.sendCount(type + ".gc", "collectionCount", gcCounter);
-        this.sendTime(type + ".gc", "collectionTimeSeconds", gcTimes);
+		long gcTimes = 0;
+		for (GarbageCollector gc : jvmStats.gc()) {
+			gcCounter += gc.collectionCount();
+			gcTimes += gc.collectionTime().getSeconds();
+		}
+		this.sendCount(type + ".gc", "collectionCount", gcCounter);
+		this.sendTime(type + ".gc", "collectionTimeSeconds", gcTimes);
 		for (JvmStats.GarbageCollector collector : jvmStats.gc().collectors()) {
 			String id = type + ".gc." + collector.name();
 			this.sendCount(id, "collectionCount", collector.collectionCount());
@@ -414,8 +414,8 @@ public class StatsdReporter {
 	private String join(String... parts)
 	{
 		if (parts == null) {
-            return null;
-        }
+			return null;
+		}
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
 			builder.append(parts[i]);
