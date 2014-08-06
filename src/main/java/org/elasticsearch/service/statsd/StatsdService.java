@@ -109,42 +109,42 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 				if (node != null && isClusterStarted) {
 					// Master Node sends cluster wide stats
 					if (node.isMasterNode()) {
-                        // Report node stats
+						// Report node stats
 						StatsdReporter nodeStatsReporter = new StatsdReporterNodeStats(
-                            StatsdService.this.nodeService.stats(
-                                new CommonStatsFlags().clear(), // indices
-                                true, // os
-                                true, // process
-                                true, // jvm
-                                true, // threadPool
-                                true, // network
-                                true, // fs
-                                true, // transport
-                                true, // http
-                                false // circuitBreaker
-                            )
+							StatsdService.this.nodeService.stats(
+								new CommonStatsFlags().clear(), // indices
+								true, // os
+								true, // process
+								true, // jvm
+								true, // threadPool
+								true, // network
+								true, // fs
+								true, // transport
+								true, // http
+								false // circuitBreaker
+							)
 						);
 						nodeStatsReporter
-                            .setStatsDClient(StatsdService.this.statsdClient)
-                            .run();
+							.setStatsDClient(StatsdService.this.statsdClient)
+							.run();
 
-                        // Report node indice stats
-                        StatsdReporter nodeIndicesStatsReporter = new StatsdReporterNodeIndicesStats(
-                            StatsdService.this.indicesService.stats(
-                                false // includePrevious
-                            )
-                        );
-                        nodeIndicesStatsReporter
-                            .setStatsDClient(StatsdService.this.statsdClient)
-                            .run();
+						// Report node indice stats
+						StatsdReporter nodeIndicesStatsReporter = new StatsdReporterNodeIndicesStats(
+							StatsdService.this.indicesService.stats(
+								false // includePrevious
+							)
+						);
+						nodeIndicesStatsReporter
+							.setStatsDClient(StatsdService.this.statsdClient)
+							.run();
 
-                        // Report indices stats
-                        StatsdReporter indicesReporter = new StatsdReporterIndices(
-                            this.getIndexShards(StatsdService.this.indicesService)
-                        );
-                        indicesReporter
-                            .setStatsDClient(StatsdService.this.statsdClient)
-                            .run();
+						// Report indices stats
+						StatsdReporter indicesReporter = new StatsdReporterIndices(
+							this.getIndexShards(StatsdService.this.indicesService)
+						);
+						indicesReporter
+							.setStatsDClient(StatsdService.this.statsdClient)
+							.run();
 					} else {
 						StatsdService.this.logger.debug(
 							"[{}]/[{}] is not master node, not triggering update",
