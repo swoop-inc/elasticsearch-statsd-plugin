@@ -58,7 +58,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 			"metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name")
 		);
 		this.statsdReportShards = settings.getAsBoolean(
-			"metrics.statsd.report.shards", true
+			"metrics.statsd.report.shards", false
 		);
 		this.statsdReportFsDetails = settings.getAsBoolean(
 			"metrics.statsd.report.fs_details", false
