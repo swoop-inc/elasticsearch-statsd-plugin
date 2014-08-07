@@ -16,7 +16,7 @@ public class StatsdReporterNodeIndicesStats extends StatsdReporterIndexStats {
 
 	public void run() {
 		try {
-			String type = this.buildMetricName("node.indices");
+			String type = this.buildMetricName("indices");
 			this.sendDocsStats(type + ".docs", this.nodeIndicesStats.getDocs());
 			this.sendStoreStats(type + ".store", this.nodeIndicesStats.getStore());
 			this.sendIndexingStats(type + ".indexing", this.nodeIndicesStats.getIndexing());
@@ -31,8 +31,7 @@ public class StatsdReporterNodeIndicesStats extends StatsdReporterIndexStats {
 			this.sendPercolateStats(type + ".percolate", this.nodeIndicesStats.getPercolate());
 			this.sendCompletionStats(type + ".completion", this.nodeIndicesStats.getCompletion());
 			this.sendSegmentsStats(type + ".segments", this.nodeIndicesStats.getSegments());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			this.logException(e);
 		}
 	}
