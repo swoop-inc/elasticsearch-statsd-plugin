@@ -23,16 +23,19 @@ import org.elasticsearch.index.engine.SegmentsStats;
 public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
 	protected void sendDocsStats(String name, DocsStats docsStats) {
+		if (null == docsStats) return;
 		this.sendCount(name, "count", docsStats.getCount());
 		this.sendCount(name, "deleted", docsStats.getDeleted());
 	}
 
 	protected void sendStoreStats(String name, StoreStats storeStats) {
+		if (null == storeStats) return;
 		this.sendCount(name, "size_in_bytes", storeStats.sizeInBytes());
 		this.sendCount(name, "throttle_time_in_millis", storeStats.getThrottleTime().millis());
 	}
 
 	protected void sendIndexingStats(String type, IndexingStats indexingStats) {
+		if (null == indexingStats) return;
 		IndexingStats.Stats totalStats = indexingStats.getTotal();
 		this.sendIndexingStatsStats(type, totalStats);
 
@@ -40,6 +43,7 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 	}
 
 	protected void sendGetStats(String type, GetStats getStats) {
+		if (null == getStats) return;
 		this.sendCount(type, "total", getStats.getCount());
 		this.sendCount(type, "time_in_millis", getStats.getTimeInMillis());
 		this.sendCount(type, "exists_total", getStats.getExistsCount());
@@ -50,6 +54,7 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 	}
 
 	protected void sendSearchStats(String type, SearchStats searchStats) {
+		if (null == searchStats) return;
 		SearchStats.Stats totalSearchStats = searchStats.getTotal();
 		this.sendSearchStatsStats(type, totalSearchStats);
 
@@ -57,6 +62,7 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 	}
 
 	protected void sendMergeStats(String type, MergeStats mergeStats) {
+		if (null == mergeStats) return;
 		this.sendGauge(type, "current", mergeStats.getCurrent());
 		this.sendGauge(type, "current_docs", mergeStats.getCurrentNumDocs());
 		this.sendGauge(type, "current_size_in_bytes", mergeStats.getCurrentSizeInBytes());
@@ -67,63 +73,73 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 	}
 
 	protected void sendRefreshStats(String type, RefreshStats refreshStats) {
+		if (null == refreshStats) return;
 		this.sendCount(type, "total", refreshStats.getTotal());
 		this.sendCount(type, "total_time_in_millis", refreshStats.getTotalTimeInMillis());
 	}
 
-	protected void sendFlushStats(String type, FlushStats flush) {
-		this.sendCount(type, "total", flush.getTotal());
-		this.sendCount(type, "total_time_in_millis", flush.getTotalTimeInMillis());
+	protected void sendFlushStats(String type, FlushStats flushStats) {
+		if (null == flushStats) return;
+		this.sendCount(type, "total", flushStats.getTotal());
+		this.sendCount(type, "total_time_in_millis", flushStats.getTotalTimeInMillis());
 	}
 
-	protected void sendFilterCacheStats(String name, FilterCacheStats filterCache) {
-		this.sendGauge(name, "memory_size_in_bytes", filterCache.getMemorySizeInBytes());
-		this.sendGauge(name, "evictions", filterCache.getEvictions());
+	protected void sendFilterCacheStats(String name, FilterCacheStats filterCacheStats) {
+		if (null == filterCacheStats) return;
+		this.sendGauge(name, "memory_size_in_bytes", filterCacheStats.getMemorySizeInBytes());
+		this.sendGauge(name, "evictions", filterCacheStats.getEvictions());
 	}
 
-	protected void sendIdCacheStats(String name, IdCacheStats idCache) {
-		this.sendGauge(name, "memory_size_in_bytes", idCache.getMemorySizeInBytes());
+	protected void sendIdCacheStats(String name, IdCacheStats idCacheStats) {
+		if (null == idCacheStats) return;
+		this.sendGauge(name, "memory_size_in_bytes", idCacheStats.getMemorySizeInBytes());
 	}
 
-	protected void sendFielddataCacheStats(String name, FieldDataStats fielddataCache) {
-		this.sendGauge(name, "memory_size_in_bytes", fielddataCache.getMemorySizeInBytes());
-		this.sendGauge(name, "evictions", fielddataCache.getEvictions());
+	protected void sendFielddataCacheStats(String name, FieldDataStats fielddataStats) {
+		if (null == fielddataStats) return;
+		this.sendGauge(name, "memory_size_in_bytes", fielddataStats.getMemorySizeInBytes());
+		this.sendGauge(name, "evictions", fielddataStats.getEvictions());
 	}
 
-	protected void sendPercolateStats(String name, PercolateStats stats) {
-		this.sendCount(name, "total", stats.getCount());
-		this.sendCount(name, "time_in_millis", stats.getTimeInMillis());
-		this.sendGauge(name, "current", stats.getCurrent());
-		this.sendCount(name, "queries", stats.getNumQueries());
+	protected void sendPercolateStats(String name, PercolateStats percolateStats) {
+		if (null == percolateStats) return;
+		this.sendCount(name, "total", percolateStats.getCount());
+		this.sendCount(name, "time_in_millis", percolateStats.getTimeInMillis());
+		this.sendGauge(name, "current", percolateStats.getCurrent());
+		this.sendCount(name, "queries", percolateStats.getNumQueries());
 
-		if (stats.getMemorySizeInBytes() != -1)
-			this.sendGauge(name, "memory_size_in_bytes", stats.getMemorySizeInBytes());
+		if (percolateStats.getMemorySizeInBytes() != -1)
+			this.sendGauge(name, "memory_size_in_bytes", percolateStats.getMemorySizeInBytes());
 	}
 
-	protected void sendCompletionStats(String name, CompletionStats stats) {
-		this.sendGauge(name, "size_in_bytes", stats.getSizeInBytes());
+	protected void sendCompletionStats(String name, CompletionStats completionStats) {
+		if (null == completionStats) return;
+		this.sendGauge(name, "size_in_bytes", completionStats.getSizeInBytes());
 	}
 
-	protected void sendSegmentsStats(String name, SegmentsStats stats) {
-		this.sendGauge(name, "count", stats.getCount());
-		this.sendGauge(name, "memory_in_bytes", stats.getMemoryInBytes());
+	protected void sendSegmentsStats(String name, SegmentsStats segmentsStats) {
+		if (null == segmentsStats) return;
+		this.sendGauge(name, "count", segmentsStats.getCount());
+		this.sendGauge(name, "memory_in_bytes", segmentsStats.getMemoryInBytes());
 	}
 
-	protected void sendIndexingStatsStats(String type, IndexingStats.Stats stats) {
-		this.sendCount(type, "index_total", stats.getIndexCount());
-		this.sendCount(type, "index_time_in_millis", stats.getIndexTimeInMillis());
-		this.sendGauge(type, "index_current", stats.getIndexCount());
-		this.sendCount(type, "delete_total", stats.getDeleteCount());
-		this.sendCount(type, "delete_time_in_millis", stats.getDeleteTimeInMillis());
-		this.sendGauge(type, "delete_current", stats.getDeleteCurrent());
+	protected void sendIndexingStatsStats(String type, IndexingStats.Stats indexingStatsStats) {
+		if (null == indexingStatsStats) return;
+		this.sendCount(type, "index_total", indexingStatsStats.getIndexCount());
+		this.sendCount(type, "index_time_in_millis", indexingStatsStats.getIndexTimeInMillis());
+		this.sendGauge(type, "index_current", indexingStatsStats.getIndexCount());
+		this.sendCount(type, "delete_total", indexingStatsStats.getDeleteCount());
+		this.sendCount(type, "delete_time_in_millis", indexingStatsStats.getDeleteTimeInMillis());
+		this.sendGauge(type, "delete_current", indexingStatsStats.getDeleteCurrent());
 	}
 
-	protected void sendSearchStatsStats(String type, SearchStats.Stats stats) {
-		this.sendCount(type, "query_total", stats.getQueryCount());
-		this.sendCount(type, "query_time_in_millis", stats.getQueryTimeInMillis());
-		this.sendGauge(type, "query_current", stats.getQueryCurrent());
-		this.sendCount(type, "fetch_total", stats.getFetchCount());
-		this.sendCount(type, "fetch_time_in_millis", stats.getFetchTimeInMillis());
-		this.sendGauge(type, "fetch_current", stats.getFetchCurrent());
+	protected void sendSearchStatsStats(String type, SearchStats.Stats searchStatsStats) {
+		if (null == searchStatsStats) return;
+		this.sendCount(type, "query_total", searchStatsStats.getQueryCount());
+		this.sendCount(type, "query_time_in_millis", searchStatsStats.getQueryTimeInMillis());
+		this.sendGauge(type, "query_current", searchStatsStats.getQueryCurrent());
+		this.sendCount(type, "fetch_total", searchStatsStats.getFetchCount());
+		this.sendCount(type, "fetch_time_in_millis", searchStatsStats.getFetchTimeInMillis());
+		this.sendGauge(type, "fetch_current", searchStatsStats.getFetchCurrent());
 	}
 }
