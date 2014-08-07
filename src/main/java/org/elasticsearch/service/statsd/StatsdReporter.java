@@ -53,12 +53,7 @@ public abstract class StatsdReporter {
 	}
 
 	protected void logException(Exception e) {
-		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("Error writing to StatsD", e);
-		}
-		else {
-			this.logger.warn("Error writing to StatsD: {}", e.getMessage());
-		}
+		this.logger.warn("Error writing to StatsD", e);
 	}
 
 	protected ESLogger getLogger() {
