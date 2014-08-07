@@ -24,14 +24,14 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
 	protected void sendDocsStats(String name, DocsStats docsStats) {
 		if (null == docsStats) return;
-		this.sendCount(name, "count", docsStats.getCount());
-		this.sendCount(name, "deleted", docsStats.getDeleted());
+		this.sendGauge(name, "count", docsStats.getCount());
+		this.sendGauge(name, "deleted", docsStats.getDeleted());
 	}
 
 	protected void sendStoreStats(String name, StoreStats storeStats) {
 		if (null == storeStats) return;
-		this.sendCount(name, "size_in_bytes", storeStats.sizeInBytes());
-		this.sendCount(name, "throttle_time_in_millis", storeStats.getThrottleTime().millis());
+		this.sendGauge(name, "size_in_bytes", storeStats.sizeInBytes());
+		this.sendGauge(name, "throttle_time_in_millis", storeStats.getThrottleTime().millis());
 	}
 
 	protected void sendIndexingStats(String name, IndexingStats indexingStats) {
@@ -44,12 +44,12 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
 	protected void sendGetStats(String name, GetStats getStats) {
 		if (null == getStats) return;
-		this.sendCount(name, "total", getStats.getCount());
-		this.sendCount(name, "time_in_millis", getStats.getTimeInMillis());
-		this.sendCount(name, "exists_total", getStats.getExistsCount());
-		this.sendCount(name, "exists_time_in_millis", getStats.getExistsTimeInMillis());
-		this.sendCount(name, "missing_total", getStats.getMissingCount());
-		this.sendCount(name, "missing_time_in_millis", getStats.getMissingTimeInMillis());
+		this.sendGauge(name, "total", getStats.getCount());
+		this.sendGauge(name, "time_in_millis", getStats.getTimeInMillis());
+		this.sendGauge(name, "exists_total", getStats.getExistsCount());
+		this.sendGauge(name, "exists_time_in_millis", getStats.getExistsTimeInMillis());
+		this.sendGauge(name, "missing_total", getStats.getMissingCount());
+		this.sendGauge(name, "missing_time_in_millis", getStats.getMissingTimeInMillis());
 		this.sendGauge(name, "current", getStats.current());
 	}
 
@@ -66,22 +66,22 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 		this.sendGauge(name, "current", mergeStats.getCurrent());
 		this.sendGauge(name, "current_docs", mergeStats.getCurrentNumDocs());
 		this.sendGauge(name, "current_size_in_bytes", mergeStats.getCurrentSizeInBytes());
-		this.sendCount(name, "total", mergeStats.getTotal());
-		this.sendCount(name, "total_time_in_millis", mergeStats.getTotalTimeInMillis());
-		this.sendCount(name, "total_docs", mergeStats.getTotalNumDocs());
-		this.sendCount(name, "total_size_in_bytes", mergeStats.getTotalSizeInBytes());
+		this.sendGauge(name, "total", mergeStats.getTotal());
+		this.sendGauge(name, "total_time_in_millis", mergeStats.getTotalTimeInMillis());
+		this.sendGauge(name, "total_docs", mergeStats.getTotalNumDocs());
+		this.sendGauge(name, "total_size_in_bytes", mergeStats.getTotalSizeInBytes());
 	}
 
 	protected void sendRefreshStats(String name, RefreshStats refreshStats) {
 		if (null == refreshStats) return;
-		this.sendCount(name, "total", refreshStats.getTotal());
-		this.sendCount(name, "total_time_in_millis", refreshStats.getTotalTimeInMillis());
+		this.sendGauge(name, "total", refreshStats.getTotal());
+		this.sendGauge(name, "total_time_in_millis", refreshStats.getTotalTimeInMillis());
 	}
 
 	protected void sendFlushStats(String name, FlushStats flushStats) {
 		if (null == flushStats) return;
-		this.sendCount(name, "total", flushStats.getTotal());
-		this.sendCount(name, "total_time_in_millis", flushStats.getTotalTimeInMillis());
+		this.sendGauge(name, "total", flushStats.getTotal());
+		this.sendGauge(name, "total_time_in_millis", flushStats.getTotalTimeInMillis());
 	}
 
 	protected void sendFilterCacheStats(String name, FilterCacheStats filterCacheStats) {
@@ -103,10 +103,10 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
 	protected void sendPercolateStats(String name, PercolateStats percolateStats) {
 		if (null == percolateStats) return;
-		this.sendCount(name, "total", percolateStats.getCount());
-		this.sendCount(name, "time_in_millis", percolateStats.getTimeInMillis());
+		this.sendGauge(name, "total", percolateStats.getCount());
+		this.sendGauge(name, "time_in_millis", percolateStats.getTimeInMillis());
 		this.sendGauge(name, "current", percolateStats.getCurrent());
-		this.sendCount(name, "queries", percolateStats.getNumQueries());
+		this.sendGauge(name, "queries", percolateStats.getNumQueries());
 
 		if (percolateStats.getMemorySizeInBytes() != -1)
 			this.sendGauge(name, "memory_size_in_bytes", percolateStats.getMemorySizeInBytes());
@@ -125,21 +125,21 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
 	protected void sendIndexingStatsStats(String name, IndexingStats.Stats indexingStatsStats) {
 		if (null == indexingStatsStats) return;
-		this.sendCount(name, "index_total", indexingStatsStats.getIndexCount());
-		this.sendCount(name, "index_time_in_millis", indexingStatsStats.getIndexTimeInMillis());
+		this.sendGauge(name, "index_total", indexingStatsStats.getIndexCount());
+		this.sendGauge(name, "index_time_in_millis", indexingStatsStats.getIndexTimeInMillis());
 		this.sendGauge(name, "index_current", indexingStatsStats.getIndexCount());
-		this.sendCount(name, "delete_total", indexingStatsStats.getDeleteCount());
-		this.sendCount(name, "delete_time_in_millis", indexingStatsStats.getDeleteTimeInMillis());
+		this.sendGauge(name, "delete_total", indexingStatsStats.getDeleteCount());
+		this.sendGauge(name, "delete_time_in_millis", indexingStatsStats.getDeleteTimeInMillis());
 		this.sendGauge(name, "delete_current", indexingStatsStats.getDeleteCurrent());
 	}
 
 	protected void sendSearchStatsStats(String name, SearchStats.Stats searchStatsStats) {
 		if (null == searchStatsStats) return;
-		this.sendCount(name, "query_total", searchStatsStats.getQueryCount());
-		this.sendCount(name, "query_time_in_millis", searchStatsStats.getQueryTimeInMillis());
+		this.sendGauge(name, "query_total", searchStatsStats.getQueryCount());
+		this.sendGauge(name, "query_time_in_millis", searchStatsStats.getQueryTimeInMillis());
 		this.sendGauge(name, "query_current", searchStatsStats.getQueryCurrent());
-		this.sendCount(name, "fetch_total", searchStatsStats.getFetchCount());
-		this.sendCount(name, "fetch_time_in_millis", searchStatsStats.getFetchTimeInMillis());
+		this.sendGauge(name, "fetch_total", searchStatsStats.getFetchCount());
+		this.sendGauge(name, "fetch_time_in_millis", searchStatsStats.getFetchTimeInMillis());
 		this.sendGauge(name, "fetch_current", searchStatsStats.getFetchCurrent());
 	}
 }

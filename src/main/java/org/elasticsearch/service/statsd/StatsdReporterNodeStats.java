@@ -54,17 +54,17 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 			this.sendGauge(id, "active", stats.getActive());
 			this.sendGauge(id, "rejected", stats.getRejected());
 			this.sendGauge(id, "largest", stats.getLargest());
-			this.sendCount(id, "completed", stats.getCompleted());
+			this.sendGauge(id, "completed", stats.getCompleted());
 		}
 	}
 
 	private void sendNodeTransportStats(TransportStats transportStats) {
 		String type = this.getPrefix("transport");
 		this.sendGauge(type, "server_open", transportStats.serverOpen());
-		this.sendCount(type, "rx_count", transportStats.rxCount());
-		this.sendCount(type, "rx_size_in_bytes", transportStats.rxSize().bytes());
-		this.sendCount(type, "tx_count", transportStats.txCount());
-		this.sendCount(type, "tx_size_in_bytes", transportStats.txSize().bytes());
+		this.sendGauge(type, "rx_count", transportStats.rxCount());
+		this.sendGauge(type, "rx_size_in_bytes", transportStats.rxSize().bytes());
+		this.sendGauge(type, "tx_count", transportStats.txCount());
+		this.sendGauge(type, "tx_size_in_bytes", transportStats.txSize().bytes());
 	}
 
 	private void sendNodeProcessStats(ProcessStats processStats) {
@@ -74,9 +74,9 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 
 		if (processStats.cpu() != null) {
 			this.sendGauge(type + ".cpu", "percent", processStats.cpu().percent());
-			this.sendCount(type + ".cpu", "sys_in_millis", processStats.cpu().sys().millis());
-			this.sendCount(type + ".cpu", "user_in_millis", processStats.cpu().user().millis());
-			this.sendCount(type + ".cpu", "total_in_millis", processStats.cpu().total().millis());
+			this.sendGauge(type + ".cpu", "sys_in_millis", processStats.cpu().sys().millis());
+			this.sendGauge(type + ".cpu", "user_in_millis", processStats.cpu().user().millis());
+			this.sendGauge(type + ".cpu", "total_in_millis", processStats.cpu().total().millis());
 		}
 
 		if (processStats.mem() != null) {
@@ -126,16 +126,16 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 
 		// might be null, if sigar isnt loaded
 		if (tcp != null) {
-			this.sendCount(type, "active_opens", tcp.getActiveOpens());
-			this.sendCount(type, "passive_opens", tcp.getPassiveOpens());
+			this.sendGauge(type, "active_opens", tcp.getActiveOpens());
+			this.sendGauge(type, "passive_opens", tcp.getPassiveOpens());
 			this.sendGauge(type, "curr_estab", tcp.getCurrEstab());
-			this.sendCount(type, "in_segs", tcp.inSegs());
-			this.sendCount(type, "out_segs", tcp.outSegs());
-			this.sendCount(type, "retrans_segs", tcp.retransSegs());
-			this.sendCount(type, "estab_resets", tcp.estabResets());
-			this.sendCount(type, "attempt_fails", tcp.attemptFails());
-			this.sendCount(type, "in_errs", tcp.inErrs());
-			this.sendCount(type, "out_rsts", tcp.outRsts());
+			this.sendGauge(type, "in_segs", tcp.inSegs());
+			this.sendGauge(type, "out_segs", tcp.outSegs());
+			this.sendGauge(type, "retrans_segs", tcp.retransSegs());
+			this.sendGauge(type, "estab_resets", tcp.estabResets());
+			this.sendGauge(type, "attempt_fails", tcp.attemptFails());
+			this.sendGauge(type, "in_errs", tcp.inErrs());
+			this.sendGauge(type, "out_rsts", tcp.outRsts());
 		}
 	}
 
@@ -165,8 +165,8 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 		for (JvmStats.GarbageCollector collector : jvmStats.gc()) {
 			String id = type + ".gc.collectors." + collector.name();
 
-			this.sendCount(id, "collection_count", collector.collectionCount());
-			this.sendCount(id, "collection_time_in_millis", collector.collectionTime().millis());
+			this.sendGauge(id, "collection_count", collector.collectionCount());
+			this.sendGauge(id, "collection_time_in_millis", collector.collectionTime().millis());
 		}
 
 		// TODO: buffer pools
@@ -175,7 +175,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	private void sendNodeHttpStats(HttpStats httpStats) {
 		String type = this.getPrefix("http");
 		this.sendGauge(type, "current_open", httpStats.getServerOpen());
-		this.sendCount(type, "total_opened", httpStats.getTotalOpen());
+		this.sendGauge(type, "total_opened", httpStats.getTotalOpen());
 	}
 
 	private void sendNodeFsStats(FsStats fs) {
@@ -212,15 +212,15 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 
 		// disk_io_op is sum of reads and writes (use graphite functions)
 		if (info.getDiskReads() != -1)
-			this.sendCount(type + typeAppend, "disk_reads", info.getDiskReads());
+			this.sendGauge(type + typeAppend, "disk_reads", info.getDiskReads());
 		if (info.getDiskWrites() != -1)
-			this.sendCount(type + typeAppend, "disk_writes", info.getDiskWrites());
+			this.sendGauge(type + typeAppend, "disk_writes", info.getDiskWrites());
 
 		// disk_io_size_in_bytes is sum of reads and writes (use graphite functions)
 		if (info.getDiskReadSizeInBytes() != -1)
-			this.sendCount(type + typeAppend, "disk_read_size_in_bytes", info.getDiskReadSizeInBytes());
+			this.sendGauge(type + typeAppend, "disk_read_size_in_bytes", info.getDiskReadSizeInBytes());
 		if (info.getDiskWriteSizeInBytes() != -1)
-			this.sendCount(type + typeAppend, "disk_write_size_in_bytes", info.getDiskWriteSizeInBytes());
+			this.sendGauge(type + typeAppend, "disk_write_size_in_bytes", info.getDiskWriteSizeInBytes());
 
 		/** TODO: Find out if these stats are useful.
 		if (info.getDiskQueue() != -1)
