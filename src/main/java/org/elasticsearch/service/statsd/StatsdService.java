@@ -32,6 +32,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 	private final Integer statsdPort;
 	private final TimeValue statsdRefreshInternal;
 	private final String statsdPrefix;
+	private final String statsdNodeName;
 	private final Boolean statsdReportShards;
 	private final Boolean statsdReportFsDetails;
 	private final StatsDClient statsdClient;
@@ -56,6 +57,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		);
 		this.statsdPrefix = settings.get(
 			"metrics.statsd.prefix", "elasticsearch" + "." + settings.get("cluster.name")
+		);
+		this.statsdNodeName = settings.get(
+			"metrics.statsd.node_name"
 		);
 		this.statsdReportShards = settings.getAsBoolean(
 			"metrics.statsd.report.shards", false
@@ -125,7 +129,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 							true, // http
 							false // circuitBreaker
 						),
-						node.getName(),
+						StatsdService.this.statsdNodeName == null ? node.getName() : StatsdService.this.statsdNodeName,
 						StatsdService.this.statsdReportFsDetails
 					);
 					nodeStatsReporter
