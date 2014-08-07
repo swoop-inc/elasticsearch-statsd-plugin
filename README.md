@@ -33,6 +33,16 @@ Check your elasticsearch log file for a line like this after adding the configur
 ```
 
 
+## Stats Key Formats
+
+This plugin reports both node level and cluster level stats, the StatsD keys will be in the formats:
+
+* `{PREFIX}.node.{NODE_NAME}.{STAT_KEY}` -- Node level stats (CPU / JVM / etc.)
+* `{PREFIX}.indices.{STAT_KEY}` -- The stats on indices across the entire cluster
+* `{PREFIX}.index.{INDEX_NAME}.total.{STAT_KEY}` -- The stats per index summed across all shards, enabled with `metrics.statsd.report.indices` (defaults to `true`)
+* `{PREFIX}.index.{INDEX_NAME}.{SHARD_ID}.{STAT_KEY}` -- The stats per shard, enabled with `metrics.statsd.report.shards` (defaults to `false`)
+
+
 ## Bugs/TODO
 
 * No really nice cluster support yet (needed it for a single instance system)
@@ -48,4 +58,3 @@ Heavily inspired by the excellent [metrics library](http://metrics.codehale.com)
 ## License
 
 See LICENSE
-
