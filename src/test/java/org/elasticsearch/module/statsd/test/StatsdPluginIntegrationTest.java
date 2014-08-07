@@ -54,14 +54,14 @@ public class StatsdPluginIntegrationTest
 		assertThat(indexResponse.getId(), is(notNullValue()));
 
 		//Index some more docs
-		this.indexSomeDocs(100);
+		this.indexSomeDocs(101);
 
 		Thread.sleep(4000);
 
 		ensureValidKeyNames();
-		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing._all.indexCount:1|c");
-		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing." + type + ".indexCount:1|c");
-		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".node.jvm.threads.peak_count:");
+		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".index." + index + ".shard.0.indexing.index_total:51|c");
+		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".index." + index + ".shard.1.indexing.index_total:51|c");
+		assertStatsdMetricIsContained(".jvm.threads.peak_count:");
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class StatsdPluginIntegrationTest
 
 		// wait for master fail over and writing to graph reporter
 		Thread.sleep(4000);
-		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing._all.indexCount:1|c");
+		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".index." + index + ".shard.0.indexing.index_total:1|c");
 	}
 
 	// the stupid hamcrest matchers have compile erros depending whether they run on java6 or java7, so I rolled my own version
