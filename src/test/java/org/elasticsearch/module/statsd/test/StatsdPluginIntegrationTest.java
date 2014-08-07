@@ -23,32 +23,37 @@ public class StatsdPluginIntegrationTest
 	private String				clusterName			= RandomStringGenerator.randomAlphabetic(10);
 	private String				index				= RandomStringGenerator.randomAlphabetic(6).toLowerCase();
 	private String				type				= RandomStringGenerator.randomAlphabetic(6).toLowerCase();
-	private Node				node;
+	private Node				node_1;
+	private Node				node_2;
 
 	@Before
 	public void startStatsdMockServerAndNode() throws Exception
 	{
 		statsdMockServer = new StatsdMockServer(STATSD_SERVER_PORT);
 		statsdMockServer.start();
-		node = createNode(clusterName, 1, STATSD_SERVER_PORT, "1s");
+		node_1 = createNode(clusterName, 2, STATSD_SERVER_PORT, "1s");
+		node_2 = createNode(clusterName, 2, STATSD_SERVER_PORT, "1s");
 	}
 
 	@After
 	public void stopStatsdServer() throws Exception
 	{
 		statsdMockServer.close();
-		if (!node.isClosed()) {
-			node.close();
+		if (!node_1.isClosed()) {
+			node_1.close();
+		}
+		if (!node_2.isClosed()) {
+			node_2.close();
 		}
 	}
 
 	@Test
 	public void testThatIndexingResultsInMonitoring() throws Exception
 	{
-		IndexResponse indexResponse = indexElement(node, index, type, "value");
+		IndexResponse indexResponse = indexElement(node_1, index, type, "value");
 		assertThat(indexResponse.getId(), is(notNullValue()));
 
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 
 		ensureValidKeyNames();
 		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing._all.indexCount:1|c");
@@ -60,18 +65,18 @@ public class StatsdPluginIntegrationTest
 	public void masterFailOverShouldWork() throws Exception
 	{
 		String clusterName = RandomStringGenerator.randomAlphabetic(10);
-		IndexResponse indexResponse = indexElement(node, index, type, "value");
+		IndexResponse indexResponse = indexElement(node_1, index, type, "value");
 		assertThat(indexResponse.getId(), is(notNullValue()));
 
-		Node origNode = node;
-		node = createNode(clusterName, 1, STATSD_SERVER_PORT, "1s");
+		Node origNode = node_1;
+		node_1 = createNode(clusterName, 1, STATSD_SERVER_PORT, "1s");
 		statsdMockServer.content.clear();
 		origNode.stop();
-		indexResponse = indexElement(node, index, type, "value");
+		indexResponse = indexElement(node_1, index, type, "value");
 		assertThat(indexResponse.getId(), is(notNullValue()));
 
 		// wait for master fail over and writing to graph reporter
-		Thread.sleep(2000);
+		Thread.sleep(4000);
 		assertStatsdMetricIsContained("elasticsearch." + clusterName + ".indexes." + index + ".id.0.indexing._all.indexCount:1|c");
 	}
 
