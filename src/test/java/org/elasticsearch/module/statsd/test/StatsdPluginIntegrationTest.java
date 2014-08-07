@@ -53,6 +53,9 @@ public class StatsdPluginIntegrationTest
 		IndexResponse indexResponse = indexElement(node_1, index, type, "value");
 		assertThat(indexResponse.getId(), is(notNullValue()));
 
+		//Index some more docs
+		this.indexSomeDocs(100);
+
 		Thread.sleep(4000);
 
 		ensureValidKeyNames();
@@ -100,5 +103,13 @@ public class StatsdPluginIntegrationTest
 	private IndexResponse indexElement(Node node, String index, String type, String fieldValue)
 	{
 		return node.client().prepareIndex(index, type).setSource("field", fieldValue).execute().actionGet();
+	}
+
+	private void indexSomeDocs(int docs)
+	{
+		while( docs > 0 ) {
+			indexElement(node_1, index, type, "value " + docs);
+			docs--;
+		}
 	}
 }
