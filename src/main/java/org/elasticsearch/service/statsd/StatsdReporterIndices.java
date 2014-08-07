@@ -30,7 +30,7 @@ public class StatsdReporterIndices extends StatsdReporterIndexStats {
 
 				if (this.reportShards) {
 					this.sendCommonStats(
-						this.buildMetricName("index." + this.indexName + ".shard." + indexShard.shardId().id()),
+						this.buildMetricName("index." + this.indexName + "." + indexShard.shardId().id()),
 						shardStats
 					);
 				}
