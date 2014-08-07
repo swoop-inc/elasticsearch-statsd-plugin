@@ -1,30 +1,41 @@
 # Elasticsearch statsd plugin
 
-This plugin creates a little push service, which regularly updates a statsd host with indices stats and nodes stats. In case you are running a cluster, these datas are always only pushed from the master node.
+This plugin creates a little push service, which regularly updates a StatsD host with indices stats and nodes stats.
+Index stats that apply across the entire cluster is only pushed from the elected master which node level stats are pushed from every node.
 
-The data sent to the statsd server tries to be roughly equivalent to [Indices Stats API](http://www.elasticsearch.org/guide/reference/api/admin-indices-stats.html) and [Nodes Stats Api](http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats.html)
+The data sent to the StatsD server tries to be roughly equivalent to the [Indices Stats API](http://www.elasticsearch.org/guide/reference/api/admin-indices-stats.html) and [Nodes Stats Api](http://www.elasticsearch.org/guide/reference/api/admin-cluster-nodes-stats.html).
 
 
 ## Installation
 
-As plugins (except site plugins) cannot be automatically installed from github currently you need to build the plugin yourself (takes half a minute including an integrations test).
+To install a prepackaged plugin use the following command:
 
 ```
-git clone http://github.com/swoop-inc/elasticsearch-statsd-plugin.git
+bin/plugin -install statsd -url https://github.com/Automattic/elasticsearch-statsd-plugin/releases/download/v0.3/elasticsearch-statsd-0.3.zip
+```
+
+You can also build your own by doing the following:
+
+```
+git clone http://github.com/Automattic/elasticsearch-statsd-plugin.git
 cd elasticsearch-statsd-plugin
 mvn package
-/path/to/elasticsearch/bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-0.2-SNAPSHOT.zip
+bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-0.3-SNAPSHOT.zip
 ```
 
 
 ## Configuration
 
-Configuration is possible via three parameters:
+Configuration is possible via these parameters:
 
 * `metrics.statsd.host`: The statsd host to connect to (default: none)
 * `metrics.statsd.port`: The port to connect to (default: 8125)
 * `metrics.statsd.every`: The interval to push data (default: 1m)
 * `metrics.statsd.prefix`: The metric prefix that's sent with metric names (default: elasticsearch.your_cluster_name)
+* `metrics.statsd.node_name`: Override the name for node used in the stat keys (default: the ES node name)
+* `metrics.statsd.report.indices`: If index level sums should be reported (default: true)
+* `metrics.statsd.report.shards`: If shard level stats should be reported (default: false)
+* `metrics.statsd.report.fs_details`: If nodes should break down the FS by device instead of total disk (default: false)
 
 Check your elasticsearch log file for a line like this after adding the configuration parameters below to the configuration file
 
@@ -45,7 +56,6 @@ This plugin reports both node level and cluster level stats, the StatsD keys wil
 
 ## Bugs/TODO
 
-* No really nice cluster support yet (needed it for a single instance system)
 * Not extensively tested
 * In case of a master node failover, counts are starting from 0 again (in case you are wondering about spikes)
 
