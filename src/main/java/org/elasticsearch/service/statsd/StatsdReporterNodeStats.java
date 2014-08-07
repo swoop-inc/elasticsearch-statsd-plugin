@@ -18,10 +18,12 @@ import org.elasticsearch.threadpool.ThreadPoolStats;
 public class StatsdReporterNodeStats extends StatsdReporter {
 
 	private final NodeStats nodeStats;
+	private final String nodeName;
 	private final Boolean statsdReportFsDetails;
 
-	public StatsdReporterNodeStats(NodeStats nodeStats, Boolean statsdReportFsDetails) {
+	public StatsdReporterNodeStats(NodeStats nodeStats, String nodeName, Boolean statsdReportFsDetails) {
 		this.nodeStats = nodeStats;
+		this.nodeName = nodeName;
 		this.statsdReportFsDetails = statsdReportFsDetails;
 	}
 
@@ -41,7 +43,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeThreadPoolStats(ThreadPoolStats threadPoolStats) {
-		String type = this.buildMetricName("node.thread_pool");
+		String type = this.getPrefix("thread_pool");
 		Iterator<ThreadPoolStats.Stats> statsIterator = threadPoolStats.iterator();
 		while (statsIterator.hasNext()) {
 			ThreadPoolStats.Stats stats = statsIterator.next();
@@ -57,7 +59,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeTransportStats(TransportStats transportStats) {
-		String type = this.buildMetricName("node.transport");
+		String type = this.getPrefix("transport");
 		this.sendGauge(type, "server_open", transportStats.serverOpen());
 		this.sendCount(type, "rx_count", transportStats.rxCount());
 		this.sendCount(type, "rx_size_in_bytes", transportStats.rxSize().bytes());
@@ -66,7 +68,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeProcessStats(ProcessStats processStats) {
-		String type = this.buildMetricName("node.process");
+		String type = this.getPrefix("process");
 
 		this.sendGauge(type, "open_file_descriptors", processStats.openFileDescriptors());
 
@@ -85,7 +87,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeOsStats(OsStats osStats) {
-		String type = this.buildMetricName("node.os");
+		String type = this.getPrefix("os");
 
 		// Java client does not support doubles yet :(
 		// https://github.com/tim-group/java-statsd-client/issues/19
@@ -119,7 +121,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeNetworkStats(NetworkStats networkStats) {
-		String type = this.buildMetricName("node.network.tcp");
+		String type = this.getPrefix("network.tcp");
 		NetworkStats.Tcp tcp = networkStats.tcp();
 
 		// might be null, if sigar isnt loaded
@@ -138,7 +140,7 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeJvmStats(JvmStats jvmStats) {
-		String type = this.buildMetricName("node.jvm");
+		String type = this.getPrefix("jvm");
 		this.sendGauge(type, "uptime", jvmStats.uptime().seconds());
 
 		// mem
@@ -172,14 +174,14 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeHttpStats(HttpStats httpStats) {
-		String type = this.buildMetricName("node.http");
+		String type = this.getPrefix("http");
 		this.sendGauge(type, "current_open", httpStats.getServerOpen());
 		this.sendGauge(type, "total_opened", httpStats.getTotalOpen());
 	}
 
 	private void sendNodeFsStats(FsStats fs) {
 		// Send total
-		String type = this.buildMetricName("node.fs");
+		String type = this.getPrefix("fs");
 		this.sendNodeFsStatsInfo(type + ".total", fs.total());
 
 		// Maybe send details
@@ -225,5 +227,9 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 			this.sendGauge(type + typeAppend, "disk_queue", (long) info.getDiskQueue());
 		if (info.getDiskServiceTime() != -1)
 			this.sendGauge(type + typeAppend, "disk_service_time", (long) info.getDiskServiceTime());
+	}
+
+	private String getPrefix(String prefix) {
+		return this.buildMetricName( "node." + this.nodeName + "." + prefix );
 	}
 }
