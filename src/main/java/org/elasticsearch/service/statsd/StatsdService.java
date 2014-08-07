@@ -33,6 +33,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 	private final TimeValue statsdRefreshInternal;
 	private final String statsdPrefix;
 	private final String statsdNodeName;
+	private final Boolean statsdReportIndices;
 	private final Boolean statsdReportShards;
 	private final Boolean statsdReportFsDetails;
 	private final StatsDClient statsdClient;
@@ -60,6 +61,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		);
 		this.statsdNodeName = settings.get(
 			"metrics.statsd.node_name"
+		);
+		this.statsdReportIndices = settings.getAsBoolean(
+			"metrics.statsd.report.indices", true
 		);
 		this.statsdReportShards = settings.getAsBoolean(
 			"metrics.statsd.report.shards", false
@@ -115,7 +119,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 					.equals(Lifecycle.State.STARTED);
 
 				if (node != null && isClusterStarted) {
-					// Report node stats
+					// Report node stats -- runs for all nodes
 					StatsdReporter nodeStatsReporter = new StatsdReporterNodeStats(
 						StatsdService.this.nodeService.stats(
 							new CommonStatsFlags().clear(), // indices
@@ -136,9 +140,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 						.setStatsDClient(StatsdService.this.statsdClient)
 						.run();
 
-					// Master Node sends cluster wide stats
+					// Master node is the only one allowed to send cluster wide sums / stats
 					if (node.isMasterNode()) {
-						// Report node indice stats
+						// Report cluster wide index totals
 						StatsdReporter nodeIndicesStatsReporter = new StatsdReporterNodeIndicesStats(
 							StatsdService.this.indicesService.stats(
 								false // includePrevious
@@ -148,18 +152,16 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 							.setStatsDClient(StatsdService.this.statsdClient)
 							.run();
 
-						// Report indices stats
-						StatsdReporter indicesReporter = new StatsdReporterIndices(
-							this.getIndexShards(StatsdService.this.indicesService)
-						);
-						indicesReporter
-							.setStatsDClient(StatsdService.this.statsdClient)
-							.run();
-					} else {
-						StatsdService.this.logger.debug(
-							"[{}]/[{}] is not master node, not triggering update",
-							node.getId(), node.getName()
-						);
+						// Maybe breakdown numbers by index or shard
+						if ( StatsdService.this.statsdReportIndices || StatsdService.this.statsdReportShards ) {
+							StatsdReporter indicesReporter = new StatsdReporterIndices(
+								this.getIndexShards(StatsdService.this.indicesService),
+								StatsdService.this.statsdReportShards
+							);
+							indicesReporter
+								.setStatsDClient(StatsdService.this.statsdClient)
+								.run();
+						}
 					}
 				}
 
@@ -174,13 +176,11 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		private List<IndexShard> getIndexShards(IndicesService indicesService) {
 			List<IndexShard> indexShards = Lists.newArrayList();
 
-			if ( StatsdService.this.statsdReportShards ) {
-				String[] indices = indicesService.indices().toArray(new String[] {});
-				for (String indexName : indices) {
-					IndexService indexService = indicesService.indexServiceSafe(indexName);
-					for (int shardId : indexService.shardIds()) {
-						indexShards.add(indexService.shard(shardId));
-					}
+			String[] indices = indicesService.indices().toArray(new String[] {});
+			for (String indexName : indices) {
+				IndexService indexService = indicesService.indexServiceSafe(indexName);
+				for (int shardId : indexService.shardIds()) {
+					indexShards.add(indexService.shard(shardId));
 				}
 			}
 
