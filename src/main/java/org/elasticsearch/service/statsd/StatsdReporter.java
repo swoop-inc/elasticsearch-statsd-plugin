@@ -19,15 +19,15 @@ public abstract class StatsdReporter {
 	public abstract void run();
 
 	protected void sendGauge(String name, String valueName, long value) {
-		this.statsdClient.gauge(this.join(name, valueName), (int) value);
+		this.statsdClient.gauge(this.join(name, valueName), value);
 	}
 
 	protected void sendCount(String name, String valueName, long value) {
-		this.statsdClient.count(this.join(name, valueName), (int) value);
+		this.statsdClient.count(this.join(name, valueName), value);
 	}
 
 	protected void sendTime(String name, String valueName, long value) {
-		this.statsdClient.time(this.join(name, valueName), (int) value);
+		this.statsdClient.time(this.join(name, valueName), value);
 	}
 
 	protected String sanitizeString(String s) {
