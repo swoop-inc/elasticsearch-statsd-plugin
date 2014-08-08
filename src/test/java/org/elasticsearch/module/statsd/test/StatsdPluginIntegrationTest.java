@@ -25,14 +25,16 @@ public class StatsdPluginIntegrationTest
 	private String				type				= RandomStringGenerator.randomAlphabetic(6).toLowerCase();
 	private Node				node_1;
 	private Node				node_2;
+	private Node				node_3;
 
 	@Before
 	public void startStatsdMockServerAndNode() throws Exception
 	{
 		statsdMockServer = new StatsdMockServer(STATSD_SERVER_PORT);
 		statsdMockServer.start();
-		node_1 = createNode(clusterName, 2, STATSD_SERVER_PORT, "1s");
-		node_2 = createNode(clusterName, 2, STATSD_SERVER_PORT, "1s");
+		node_1 = createNode(clusterName, 4, STATSD_SERVER_PORT, "1s");
+		node_2 = createNode(clusterName, 4, STATSD_SERVER_PORT, "1s");
+		node_3 = createNode(clusterName, 4, STATSD_SERVER_PORT, "1s");
 	}
 
 	@After
@@ -44,6 +46,9 @@ public class StatsdPluginIntegrationTest
 		}
 		if (!node_2.isClosed()) {
 			node_2.close();
+		}
+		if (!node_3.isClosed()) {
+			node_3.close();
 		}
 	}
 
