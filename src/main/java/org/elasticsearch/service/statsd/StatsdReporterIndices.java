@@ -11,20 +11,23 @@ import org.elasticsearch.action.admin.indices.stats.CommonStatsFlags;
 public class StatsdReporterIndices extends StatsdReporterIndexStats {
 
 	private final List<IndexShard> indexShards;
+	private final Boolean reportIndices;
 	private final Boolean reportShards;
 	private String indexName;
 	private CommonStats indexStats;
+	private CommonStats indexTotalStats;
 
-	public StatsdReporterIndices(List<IndexShard> indexShards, Boolean reportShards) {
+	public StatsdReporterIndices(List<IndexShard> indexShards, Boolean reportIndices, Boolean reportShards) {
 		this.indexShards = indexShards;
+		this.reportIndices = reportIndices;
 		this.reportShards = reportShards;
 	}
 
 	public void run() {
 		try {
-			for (IndexShard indexShard : this.indexShards) {
-				this.maybeResetSums(indexShard.shardId().index().name());
+			this.indexTotalStats = new CommonStats(CommonStatsFlags.ALL);
 
+			for (IndexShard indexShard : this.indexShards) {
 				// Create common stats for shard
 				CommonStats shardStats = new CommonStats(indexShard, CommonStatsFlags.ALL);
 
@@ -35,11 +38,24 @@ public class StatsdReporterIndices extends StatsdReporterIndexStats {
 					);
 				}
 
-				// Add to current index totals
-				this.indexStats.add(shardStats);
+				if (this.reportIndices) {
+					this.maybeResetSums(indexShard.shardId().index().name());
+					this.indexStats.add(shardStats);
+				}
+
+				this.indexTotalStats.add(shardStats);
 			}
-			// Send last index group
-			this.maybeResetSums("");
+
+			// Send last index group... maybe
+			if (this.reportIndices) {
+				this.maybeResetSums("");
+			}
+
+			// Send index totals
+			this.sendCommonStats(
+				this.buildMetricName("indices"),
+				this.indexTotalStats
+			);
 		} catch (Exception e) {
 			this.logException(e);
 		}
@@ -50,6 +66,7 @@ public class StatsdReporterIndices extends StatsdReporterIndexStats {
 			return; // Same index do nothing
 		}
 
+		// Index name changed to some other value, send the last sum
 		if (this.indexName != null) {
 			this.sendCommonStats(
 				this.buildMetricName("index." + this.indexName + ".total"),
@@ -57,6 +74,7 @@ public class StatsdReporterIndices extends StatsdReporterIndexStats {
 			);
 		}
 
+		// Set new index name and reset to empty common stats
 		this.indexName = newIndexName;
 		this.indexStats = new CommonStats(CommonStatsFlags.ALL);
 	}

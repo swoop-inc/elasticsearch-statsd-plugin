@@ -92,7 +92,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 			);
 		} else {
 			this.logger.error(
-				"StatsD reporting disabled, no statsd host configured"
+				"StatsD reporting disabled, no StatsD host configured"
 			);
 		}
 	}
@@ -164,16 +164,14 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 
 					// Master node is the only one allowed to send cluster wide sums / stats
 					if (state.nodes().localNodeMaster()) {
-						// Maybe breakdown numbers by index or shard
-						if ( StatsdService.this.statsdReportIndices || StatsdService.this.statsdReportShards ) {
-							StatsdReporter indicesReporter = new StatsdReporterIndices(
-								this.getIndexShards(StatsdService.this.indicesService),
-								StatsdService.this.statsdReportShards
-							);
-							indicesReporter
-								.setStatsDClient(StatsdService.this.statsdClient)
-								.run();
-						}
+						StatsdReporter indicesReporter = new StatsdReporterIndices(
+							this.getIndexShards(StatsdService.this.indicesService),
+							StatsdService.this.statsdReportIndices,
+							StatsdService.this.statsdReportShards
+						);
+						indicesReporter
+							.setStatsDClient(StatsdService.this.statsdClient)
+							.run();
 					}
 				}
 
