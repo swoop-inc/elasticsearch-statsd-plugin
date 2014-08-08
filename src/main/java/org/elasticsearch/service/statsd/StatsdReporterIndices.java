@@ -4,79 +4,50 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.index.shard.service.IndexShard;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.elasticsearch.action.admin.indices.stats.CommonStatsFlags;
+import org.elasticsearch.action.admin.indices.stats.*;
 
 public class StatsdReporterIndices extends StatsdReporterIndexStats {
 
-	private final List<IndexShard> indexShards;
+	private final IndicesStatsResponse indicesStatsResponse;
 	private final Boolean reportIndices;
 	private final Boolean reportShards;
-	private String indexName;
-	private CommonStats indexStats;
-	private CommonStats indexTotalStats;
 
-	public StatsdReporterIndices(List<IndexShard> indexShards, Boolean reportIndices, Boolean reportShards) {
-		this.indexShards = indexShards;
+	public StatsdReporterIndices(IndicesStatsResponse indicesStatsResponse, Boolean reportIndices, Boolean reportShards) {
+		this.indicesStatsResponse = indicesStatsResponse;
 		this.reportIndices = reportIndices;
 		this.reportShards = reportShards;
 	}
 
 	public void run() {
 		try {
-			this.indexTotalStats = new CommonStats(CommonStatsFlags.ALL);
-
-			for (IndexShard indexShard : this.indexShards) {
-				// Create common stats for shard
-				CommonStats shardStats = new CommonStats(indexShard, CommonStatsFlags.ALL);
-
-				if (this.reportShards) {
-					this.sendCommonStats(
-						this.buildMetricName("index." + this.indexName + "." + indexShard.shardId().id()),
-						shardStats
-					);
-				}
-
-				if (this.reportIndices) {
-					this.maybeResetSums(indexShard.shardId().index().name());
-					this.indexStats.add(shardStats);
-				}
-
-				this.indexTotalStats.add(shardStats);
-			}
-
-			// Send last index group... maybe
-			if (this.reportIndices) {
-				this.maybeResetSums("");
-			}
-
-			// Send index totals
+			// First report totals
 			this.sendCommonStats(
 				this.buildMetricName("indices"),
-				this.indexTotalStats
+				this.indicesStatsResponse.getTotal()
 			);
+
+			if (this.reportIndices) {
+				for (IndexStats indexStats : this.indicesStatsResponse.getIndices().values()) {
+					String indexPrefix = "index." + indexStats.getIndex();
+
+					this.sendCommonStats(
+						this.buildMetricName(indexPrefix + ".total"),
+						indexStats.getTotal()
+					);
+
+					if (this.reportShards) {
+						for (IndexShardStats indexShardStats : indexStats.getIndexShards().values()) {
+							this.sendCommonStats(
+								this.buildMetricName(indexPrefix + "." + indexShardStats.getShardId().id()),
+								indexShardStats.getTotal()
+							);
+						}
+					}
+				}
+			}
 		} catch (Exception e) {
 			this.logException(e);
 		}
-	}
-
-	private void maybeResetSums(String newIndexName) {
-		if (this.indexName == newIndexName) {
-			return; // Same index do nothing
-		}
-
-		// Index name changed to some other value, send the last sum
-		if (this.indexName != null) {
-			this.sendCommonStats(
-				this.buildMetricName("index." + this.indexName + ".total"),
-				this.indexStats
-			);
-		}
-
-		// Set new index name and reset to empty common stats
-		this.indexName = newIndexName;
-		this.indexStats = new CommonStats(CommonStatsFlags.ALL);
 	}
 
 	private void sendCommonStats(String prefix, CommonStats stats) {

@@ -1,31 +1,26 @@
 package org.elasticsearch.service.statsd;
 
-import java.util.List;
-
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.action.admin.indices.stats.CommonStatsFlags;
 import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.cluster.node.DiscoveryNode;
-import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.component.AbstractLifecycleComponent;
 import org.elasticsearch.common.component.Lifecycle;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.util.concurrent.EsExecutors;
-import org.elasticsearch.index.service.IndexService;
-import org.elasticsearch.index.shard.service.IndexShard;
 import org.elasticsearch.indices.IndicesService;
-import org.elasticsearch.indices.NodeIndicesStats;
 import org.elasticsearch.node.service.NodeService;
 import org.elasticsearch.cluster.ClusterState;
+import org.elasticsearch.client.Client;
 
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
 public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 
+	private final Client client;
 	private final ClusterService clusterService;
 	private final IndicesService indicesService;
 	private final NodeService nodeService;
@@ -44,8 +39,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 	private volatile boolean closed;
 
 	@Inject
-	public StatsdService(Settings settings, ClusterService clusterService, IndicesService indicesService, NodeService nodeService) {
+	public StatsdService(Settings settings, Client client, ClusterService clusterService, IndicesService indicesService, NodeService nodeService) {
 		super(settings);
+		this.client = client;
 		this.clusterService = clusterService;
 		this.indicesService = indicesService;
 		this.nodeService = nodeService;
@@ -165,7 +161,12 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 					// Master node is the only one allowed to send cluster wide sums / stats
 					if (state.nodes().localNodeMaster()) {
 						StatsdReporter indicesReporter = new StatsdReporterIndices(
-							this.getIndexShards(StatsdService.this.indicesService),
+							StatsdService.this.client
+								.admin()        // AdminClient
+								.indices()      // IndicesAdminClient
+								.prepareStats() // IndicesStatsRequestBuilder
+								.all()          // IndicesStatsRequestBuilder
+								.get(),         // IndicesStatsResponse
 							StatsdService.this.statsdReportIndices,
 							StatsdService.this.statsdReportShards
 						);
@@ -181,20 +182,6 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 					continue;
 				}
 			}
-		}
-
-		private List<IndexShard> getIndexShards(IndicesService indicesService) {
-			List<IndexShard> indexShards = Lists.newArrayList();
-
-			String[] indices = indicesService.indices().toArray(new String[] {});
-			for (String indexName : indices) {
-				IndexService indexService = indicesService.indexServiceSafe(indexName);
-				for (int shardId : indexService.shardIds()) {
-					indexShards.add(indexService.shard(shardId));
-				}
-			}
-
-			return indexShards;
 		}
 	}
 }
