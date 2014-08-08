@@ -11,7 +11,7 @@ The data sent to the StatsD server tries to be roughly equivalent to the [Indice
 To install a prepackaged plugin use the following command:
 
 ```
-bin/plugin -install statsd -url https://github.com/Automattic/elasticsearch-statsd-plugin/releases/download/v0.3.1/elasticsearch-statsd-0.3.1.zip
+bin/plugin -install statsd -url https://github.com/Automattic/elasticsearch-statsd-plugin/releases/download/v0.3.2/elasticsearch-statsd-0.3.2.zip
 ```
 
 You can also build your own by doing the following:
@@ -20,7 +20,7 @@ You can also build your own by doing the following:
 git clone http://github.com/Automattic/elasticsearch-statsd-plugin.git
 cd elasticsearch-statsd-plugin
 mvn package
-bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-0.3.1.zip
+bin/plugin -install statsd -url file:///absolute/path/to/current/dir/target/releases/elasticsearch-statsd-0.3.2.zip
 ```
 
 
