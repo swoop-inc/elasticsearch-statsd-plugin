@@ -19,6 +19,7 @@ import org.elasticsearch.index.shard.service.IndexShard;
 import org.elasticsearch.indices.IndicesService;
 import org.elasticsearch.indices.NodeIndicesStats;
 import org.elasticsearch.node.service.NodeService;
+import org.elasticsearch.cluster.ClusterState;
 
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
@@ -114,11 +115,12 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		public void run() {
 			while (!StatsdService.this.closed) {
 				DiscoveryNode node = StatsdService.this.clusterService.localNode();
+				ClusterState state = StatsdService.this.clusterService.state();
 				boolean isClusterStarted = StatsdService.this.clusterService
 					.lifecycleState()
 					.equals(Lifecycle.State.STARTED);
 
-				if (node != null && isClusterStarted) {
+				if (node != null && state != null && isClusterStarted) {
 					// Report node stats -- runs for all nodes
 					StatsdReporter nodeStatsReporter = new StatsdReporterNodeStats(
 						StatsdService.this.nodeService.stats(
@@ -141,7 +143,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 						.run();
 
 					// Master node is the only one allowed to send cluster wide sums / stats
-					if (node.isMasterNode()) {
+					if (state.nodes().localNodeMaster()) {
 						// Report cluster wide index totals
 						StatsdReporter nodeIndicesStatsReporter = new StatsdReporterNodeIndicesStats(
 							StatsdService.this.indicesService.stats(
