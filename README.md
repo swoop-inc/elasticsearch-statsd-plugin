@@ -64,7 +64,7 @@ This plugin reports both node level and cluster level stats, the StatsD keys wil
 
 ## Credits
 
-Heavily inspired by the excellent [metrics library](http://metrics.codehale.com) by Code Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
+Heavily inspired by the excellent [metrics library](http://metrics.codahale.com) by Coda Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
 
 
 ## License
