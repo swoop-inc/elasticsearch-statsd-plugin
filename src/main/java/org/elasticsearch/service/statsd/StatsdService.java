@@ -34,6 +34,7 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 	private final TimeValue statsdRefreshInternal;
 	private final String statsdPrefix;
 	private final String statsdNodeName;
+	private final Boolean statsdReportNodeIndices;
 	private final Boolean statsdReportIndices;
 	private final Boolean statsdReportShards;
 	private final Boolean statsdReportFsDetails;
@@ -62,6 +63,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 		);
 		this.statsdNodeName = settings.get(
 			"metrics.statsd.node_name"
+		);
+		this.statsdReportNodeIndices = settings.getAsBoolean(
+			"metrics.statsd.report.node_indices", false
 		);
 		this.statsdReportIndices = settings.getAsBoolean(
 			"metrics.statsd.report.indices", true
@@ -121,6 +125,9 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 					.equals(Lifecycle.State.STARTED);
 
 				if (node != null && state != null && isClusterStarted) {
+					String statsdNodeName = StatsdService.this.statsdNodeName;
+					if (null == statsdNodeName) statsdNodeName = node.getName();
+
 					// Report node stats -- runs for all nodes
 					StatsdReporter nodeStatsReporter = new StatsdReporterNodeStats(
 						StatsdService.this.nodeService.stats(
@@ -135,25 +142,28 @@ public class StatsdService extends AbstractLifecycleComponent<StatsdService> {
 							true, // http
 							false // circuitBreaker
 						),
-						StatsdService.this.statsdNodeName == null ? node.getName() : StatsdService.this.statsdNodeName,
+						statsdNodeName,
 						StatsdService.this.statsdReportFsDetails
 					);
 					nodeStatsReporter
 						.setStatsDClient(StatsdService.this.statsdClient)
 						.run();
 
-					// Master node is the only one allowed to send cluster wide sums / stats
-					if (state.nodes().localNodeMaster()) {
-						// Report cluster wide index totals
+					// Maybe report index stats per node
+					if (StatsdService.this.statsdReportNodeIndices && node.isDataNode()) {
 						StatsdReporter nodeIndicesStatsReporter = new StatsdReporterNodeIndicesStats(
 							StatsdService.this.indicesService.stats(
 								false // includePrevious
-							)
+							),
+							statsdNodeName
 						);
 						nodeIndicesStatsReporter
 							.setStatsDClient(StatsdService.this.statsdClient)
 							.run();
+					}
 
+					// Master node is the only one allowed to send cluster wide sums / stats
+					if (state.nodes().localNodeMaster()) {
 						// Maybe breakdown numbers by index or shard
 						if ( StatsdService.this.statsdReportIndices || StatsdService.this.statsdReportShards ) {
 							StatsdReporter indicesReporter = new StatsdReporterIndices(
