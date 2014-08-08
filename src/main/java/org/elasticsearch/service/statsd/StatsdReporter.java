@@ -55,8 +55,4 @@ public abstract class StatsdReporter {
 	protected void logException(Exception e) {
 		this.logger.warn("Error writing to StatsD", e);
 	}
-
-	protected ESLogger getLogger() {
-		return this.logger;
-	}
 }
