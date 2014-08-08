@@ -19,6 +19,7 @@ import org.elasticsearch.index.merge.MergeStats;
 import org.elasticsearch.index.percolator.stats.PercolateStats;
 import org.elasticsearch.search.suggest.completion.CompletionStats;
 import org.elasticsearch.index.engine.SegmentsStats;
+import org.elasticsearch.index.warmer.WarmerStats;
 
 public abstract class StatsdReporterIndexStats extends StatsdReporter {
 
@@ -82,6 +83,13 @@ public abstract class StatsdReporterIndexStats extends StatsdReporter {
 		if (null == flushStats) return;
 		this.sendGauge(name, "total", flushStats.getTotal());
 		this.sendGauge(name, "total_time_in_millis", flushStats.getTotalTimeInMillis());
+	}
+
+	protected void sendWarmerStats(String name, WarmerStats warmerStats) {
+		if (null == warmerStats) return;
+		this.sendGauge(name, "current", warmerStats.current());
+		this.sendGauge(name, "total", warmerStats.total());
+		this.sendGauge(name, "total_time_in_millis", warmerStats.totalTimeInMillis());
 	}
 
 	protected void sendFilterCacheStats(String name, FilterCacheStats filterCacheStats) {

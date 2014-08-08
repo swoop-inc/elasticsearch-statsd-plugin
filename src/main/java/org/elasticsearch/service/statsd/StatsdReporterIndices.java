@@ -59,11 +59,11 @@ public class StatsdReporterIndices extends StatsdReporterIndexStats {
 		this.sendMergeStats(prefix + ".merges", stats.getMerge());
 		this.sendRefreshStats(prefix + ".refresh", stats.getRefresh());
 		this.sendFlushStats(prefix + ".flush", stats.getFlush());
-		//TODO: getWarmer
+		this.sendWarmerStats(prefix + ".warmer", stats.getWarmer());
 		this.sendFilterCacheStats(prefix + ".filter_cache", stats.getFilterCache());
 		this.sendIdCacheStats(prefix + ".id_cache", stats.getIdCache());
 		this.sendFielddataCacheStats(prefix + ".fielddata", stats.getFieldData());
-		//TODO: getPercolate
+		this.sendPercolateStats(prefix + ".percolate", stats.getPercolate());
 		this.sendCompletionStats(prefix + ".completion", stats.getCompletion());
 		this.sendSegmentsStats(prefix + ".segments", stats.getSegments());
 		//TODO: getTranslog
