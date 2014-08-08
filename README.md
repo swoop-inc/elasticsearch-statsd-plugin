@@ -33,6 +33,7 @@ Configuration is possible via these parameters:
 * `metrics.statsd.every`: The interval to push data (default: 1m)
 * `metrics.statsd.prefix`: The metric prefix that's sent with metric names (default: elasticsearch.your_cluster_name)
 * `metrics.statsd.node_name`: Override the name for node used in the stat keys (default: the ES node name)
+* `metrics.statsd.report.node_indices`: If per node index sums should be reported (default: false)
 * `metrics.statsd.report.indices`: If index level sums should be reported (default: true)
 * `metrics.statsd.report.shards`: If shard level stats should be reported (default: false)
 * `metrics.statsd.report.fs_details`: If nodes should break down the FS by device instead of total disk (default: false)
@@ -48,10 +49,11 @@ Check your elasticsearch log file for a line like this after adding the configur
 
 This plugin reports both node level and cluster level stats, the StatsD keys will be in the formats:
 
-* `{PREFIX}.node.{NODE_NAME}.{STAT_KEY}` -- Node level stats (CPU / JVM / etc.)
-* `{PREFIX}.indices.{STAT_KEY}` -- The stats on indices across the entire cluster
-* `{PREFIX}.index.{INDEX_NAME}.total.{STAT_KEY}` -- The stats per index summed across all shards, enabled with `metrics.statsd.report.indices` (defaults to `true`)
-* `{PREFIX}.index.{INDEX_NAME}.{SHARD_ID}.{STAT_KEY}` -- The stats per shard, enabled with `metrics.statsd.report.shards` (defaults to `false`)
+* `{PREFIX}.node.{NODE_NAME}.{STAT_KEY}`: Node level stats (CPU / JVM / etc.)
+* `{PREFIX}.node.{NODE_NAME}.indices.{STAT_KEY}`: Index stats summed across the node (off by default)
+* `{PREFIX}.indices.{STAT_KEY}`: Index stats summed across the entire cluster
+* `{PREFIX}.index.{INDEX_NAME}.total.{STAT_KEY}`: Index stats summed per index across all shards
+* `{PREFIX}.index.{INDEX_NAME}.{SHARD_ID}.{STAT_KEY}` -- Index stats per shard (off by default)
 
 
 ## Bugs/TODO
