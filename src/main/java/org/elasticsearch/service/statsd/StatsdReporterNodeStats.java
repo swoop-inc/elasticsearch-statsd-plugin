@@ -43,113 +43,113 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	}
 
 	private void sendNodeThreadPoolStats(ThreadPoolStats threadPoolStats) {
-		String type = this.getPrefix("thread_pool");
+		String prefix = this.getPrefix("thread_pool");
 		Iterator<ThreadPoolStats.Stats> statsIterator = threadPoolStats.iterator();
 		while (statsIterator.hasNext()) {
 			ThreadPoolStats.Stats stats = statsIterator.next();
-			String id = type + "." + stats.getName();
+			String threadPoolType = prefix + "." + stats.getName();
 
-			this.sendGauge(id, "threads", stats.getThreads());
-			this.sendGauge(id, "queue", stats.getQueue());
-			this.sendGauge(id, "active", stats.getActive());
-			this.sendGauge(id, "rejected", stats.getRejected());
-			this.sendGauge(id, "largest", stats.getLargest());
-			this.sendGauge(id, "completed", stats.getCompleted());
+			this.sendGauge(threadPoolType, "threads", stats.getThreads());
+			this.sendGauge(threadPoolType, "queue", stats.getQueue());
+			this.sendGauge(threadPoolType, "active", stats.getActive());
+			this.sendGauge(threadPoolType, "rejected", stats.getRejected());
+			this.sendGauge(threadPoolType, "largest", stats.getLargest());
+			this.sendGauge(threadPoolType, "completed", stats.getCompleted());
 		}
 	}
 
 	private void sendNodeTransportStats(TransportStats transportStats) {
-		String type = this.getPrefix("transport");
-		this.sendGauge(type, "server_open", transportStats.serverOpen());
-		this.sendGauge(type, "rx_count", transportStats.rxCount());
-		this.sendGauge(type, "rx_size_in_bytes", transportStats.rxSize().bytes());
-		this.sendGauge(type, "tx_count", transportStats.txCount());
-		this.sendGauge(type, "tx_size_in_bytes", transportStats.txSize().bytes());
+		String prefix = this.getPrefix("transport");
+		this.sendGauge(prefix, "server_open", transportStats.serverOpen());
+		this.sendGauge(prefix, "rx_count", transportStats.rxCount());
+		this.sendGauge(prefix, "rx_size_in_bytes", transportStats.rxSize().bytes());
+		this.sendGauge(prefix, "tx_count", transportStats.txCount());
+		this.sendGauge(prefix, "tx_size_in_bytes", transportStats.txSize().bytes());
 	}
 
 	private void sendNodeProcessStats(ProcessStats processStats) {
-		String type = this.getPrefix("process");
+		String prefix = this.getPrefix("process");
 
-		this.sendGauge(type, "open_file_descriptors", processStats.openFileDescriptors());
+		this.sendGauge(prefix, "open_file_descriptors", processStats.openFileDescriptors());
 
 		if (processStats.cpu() != null) {
-			this.sendGauge(type + ".cpu", "percent", processStats.cpu().percent());
-			this.sendGauge(type + ".cpu", "sys_in_millis", processStats.cpu().sys().millis());
-			this.sendGauge(type + ".cpu", "user_in_millis", processStats.cpu().user().millis());
-			this.sendGauge(type + ".cpu", "total_in_millis", processStats.cpu().total().millis());
+			this.sendGauge(prefix + ".cpu", "percent", processStats.cpu().percent());
+			this.sendGauge(prefix + ".cpu", "sys_in_millis", processStats.cpu().sys().millis());
+			this.sendGauge(prefix + ".cpu", "user_in_millis", processStats.cpu().user().millis());
+			this.sendGauge(prefix + ".cpu", "total_in_millis", processStats.cpu().total().millis());
 		}
 
 		if (processStats.mem() != null) {
-			this.sendGauge(type + ".mem", "resident_in_bytes", processStats.mem().resident().bytes());
-			this.sendGauge(type + ".mem", "share_in_bytes", processStats.mem().share().bytes());
-			this.sendGauge(type + ".mem", "total_virtual_in_bytes", processStats.mem().totalVirtual().bytes());
+			this.sendGauge(prefix + ".mem", "resident_in_bytes", processStats.mem().resident().bytes());
+			this.sendGauge(prefix + ".mem", "share_in_bytes", processStats.mem().share().bytes());
+			this.sendGauge(prefix + ".mem", "total_virtual_in_bytes", processStats.mem().totalVirtual().bytes());
 		}
 	}
 
 	private void sendNodeOsStats(OsStats osStats) {
-		String type = this.getPrefix("os");
+		String prefix = this.getPrefix("os");
 
 		// Java client does not support doubles yet :(
 		// https://github.com/tim-group/java-statsd-client/issues/19
 		double[] loadAverage = osStats.getLoadAverage();
 		if (loadAverage.length > 0) {
-			this.sendGauge(type + ".load_average", "1m", (long) loadAverage[0]);
-			this.sendGauge(type + ".load_average", "5m", (long) loadAverage[1]);
-			this.sendGauge(type + ".load_average", "15m", (long) loadAverage[2]);
+			this.sendGauge(prefix + ".load_average", "1m", (long) loadAverage[0]);
+			this.sendGauge(prefix + ".load_average", "5m", (long) loadAverage[1]);
+			this.sendGauge(prefix + ".load_average", "15m", (long) loadAverage[2]);
 		}
 
 		if (osStats.cpu() != null) {
-			this.sendGauge(type + ".cpu", "sys", osStats.cpu().sys());
-			this.sendGauge(type + ".cpu", "user", osStats.cpu().user());
-			this.sendGauge(type + ".cpu", "idle", osStats.cpu().idle());
-			this.sendGauge(type + ".cpu", "stolen", osStats.cpu().stolen());
+			this.sendGauge(prefix + ".cpu", "sys", osStats.cpu().sys());
+			this.sendGauge(prefix + ".cpu", "user", osStats.cpu().user());
+			this.sendGauge(prefix + ".cpu", "idle", osStats.cpu().idle());
+			this.sendGauge(prefix + ".cpu", "stolen", osStats.cpu().stolen());
 		}
 
 		if (osStats.mem() != null) {
-			this.sendGauge(type + ".mem", "free_in_bytes", osStats.mem().free().bytes());
-			this.sendGauge(type + ".mem", "used_in_bytes", osStats.mem().used().bytes());
-			this.sendGauge(type + ".mem", "free_percent", osStats.mem().freePercent());
-			this.sendGauge(type + ".mem", "used_percent", osStats.mem().usedPercent());
-			this.sendGauge(type + ".mem", "actual_free_in_bytes", osStats.mem().actualFree().bytes());
-			this.sendGauge(type + ".mem", "actual_used_in_bytes", osStats.mem().actualUsed().bytes());
+			this.sendGauge(prefix + ".mem", "free_in_bytes", osStats.mem().free().bytes());
+			this.sendGauge(prefix + ".mem", "used_in_bytes", osStats.mem().used().bytes());
+			this.sendGauge(prefix + ".mem", "free_percent", osStats.mem().freePercent());
+			this.sendGauge(prefix + ".mem", "used_percent", osStats.mem().usedPercent());
+			this.sendGauge(prefix + ".mem", "actual_free_in_bytes", osStats.mem().actualFree().bytes());
+			this.sendGauge(prefix + ".mem", "actual_used_in_bytes", osStats.mem().actualUsed().bytes());
 		}
 
 		if (osStats.swap() != null) {
-			this.sendGauge(type + ".swap", "free_in_bytes", osStats.swap().free().bytes());
-			this.sendGauge(type + ".swap", "used_in_bytes", osStats.swap().used().bytes());
+			this.sendGauge(prefix + ".swap", "free_in_bytes", osStats.swap().free().bytes());
+			this.sendGauge(prefix + ".swap", "used_in_bytes", osStats.swap().used().bytes());
 		}
 	}
 
 	private void sendNodeNetworkStats(NetworkStats networkStats) {
-		String type = this.getPrefix("network.tcp");
+		String prefix = this.getPrefix("network.tcp");
 		NetworkStats.Tcp tcp = networkStats.tcp();
 
 		// might be null, if sigar isnt loaded
 		if (tcp != null) {
-			this.sendGauge(type, "active_opens", tcp.getActiveOpens());
-			this.sendGauge(type, "passive_opens", tcp.getPassiveOpens());
-			this.sendGauge(type, "curr_estab", tcp.getCurrEstab());
-			this.sendGauge(type, "in_segs", tcp.inSegs());
-			this.sendGauge(type, "out_segs", tcp.outSegs());
-			this.sendGauge(type, "retrans_segs", tcp.retransSegs());
-			this.sendGauge(type, "estab_resets", tcp.estabResets());
-			this.sendGauge(type, "attempt_fails", tcp.attemptFails());
-			this.sendGauge(type, "in_errs", tcp.inErrs());
-			this.sendGauge(type, "out_rsts", tcp.outRsts());
+			this.sendGauge(prefix, "active_opens", tcp.getActiveOpens());
+			this.sendGauge(prefix, "passive_opens", tcp.getPassiveOpens());
+			this.sendGauge(prefix, "curr_estab", tcp.getCurrEstab());
+			this.sendGauge(prefix, "in_segs", tcp.inSegs());
+			this.sendGauge(prefix, "out_segs", tcp.outSegs());
+			this.sendGauge(prefix, "retrans_segs", tcp.retransSegs());
+			this.sendGauge(prefix, "estab_resets", tcp.estabResets());
+			this.sendGauge(prefix, "attempt_fails", tcp.attemptFails());
+			this.sendGauge(prefix, "in_errs", tcp.inErrs());
+			this.sendGauge(prefix, "out_rsts", tcp.outRsts());
 		}
 	}
 
 	private void sendNodeJvmStats(JvmStats jvmStats) {
-		String type = this.getPrefix("jvm");
+		String prefix = this.getPrefix("jvm");
 
 		// mem
-		this.sendGauge(type + ".mem", "heap_used_percent", jvmStats.mem().heapUsedPercent());
-		this.sendGauge(type + ".mem", "heap_used_in_bytes", jvmStats.mem().heapUsed().bytes());
-		this.sendGauge(type + ".mem", "heap_committed_in_bytes", jvmStats.mem().heapCommitted().bytes());
-		this.sendGauge(type + ".mem", "non_heap_used_in_bytes", jvmStats.mem().nonHeapUsed().bytes());
-		this.sendGauge(type + ".mem", "non_heap_committed_in_bytes", jvmStats.mem().nonHeapCommitted().bytes());
+		this.sendGauge(prefix + ".mem", "heap_used_percent", jvmStats.mem().heapUsedPercent());
+		this.sendGauge(prefix + ".mem", "heap_used_in_bytes", jvmStats.mem().heapUsed().bytes());
+		this.sendGauge(prefix + ".mem", "heap_committed_in_bytes", jvmStats.mem().heapCommitted().bytes());
+		this.sendGauge(prefix + ".mem", "non_heap_used_in_bytes", jvmStats.mem().nonHeapUsed().bytes());
+		this.sendGauge(prefix + ".mem", "non_heap_committed_in_bytes", jvmStats.mem().nonHeapCommitted().bytes());
 		for (JvmStats.MemoryPool memoryPool : jvmStats.mem()) {
-			String memoryPoolType = type + ".mem.pools." + memoryPool.name();
+			String memoryPoolType = prefix + ".mem.pools." + memoryPool.name();
 
 			this.sendGauge(memoryPoolType, "max_in_bytes", memoryPool.max().bytes());
 			this.sendGauge(memoryPoolType, "used_in_bytes", memoryPool.used().bytes());
@@ -158,75 +158,75 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 		}
 
 		// threads
-		this.sendGauge(type + ".threads", "count", jvmStats.threads().count());
-		this.sendGauge(type + ".threads", "peak_count", jvmStats.threads().peakCount());
+		this.sendGauge(prefix + ".threads", "count", jvmStats.threads().count());
+		this.sendGauge(prefix + ".threads", "peak_count", jvmStats.threads().peakCount());
 
 		// garbage collectors
 		for (JvmStats.GarbageCollector collector : jvmStats.gc()) {
-			String id = type + ".gc.collectors." + collector.name();
+			String gcCollectorType = prefix + ".gc.collectors." + collector.name();
 
-			this.sendGauge(id, "collection_count", collector.collectionCount());
-			this.sendGauge(id, "collection_time_in_millis", collector.collectionTime().millis());
+			this.sendGauge(gcCollectorType, "collection_count", collector.collectionCount());
+			this.sendGauge(gcCollectorType, "collection_time_in_millis", collector.collectionTime().millis());
 		}
 
 		// TODO: buffer pools
 	}
 
 	private void sendNodeHttpStats(HttpStats httpStats) {
-		String type = this.getPrefix("http");
-		this.sendGauge(type, "current_open", httpStats.getServerOpen());
-		this.sendGauge(type, "total_opened", httpStats.getTotalOpen());
+		String prefix = this.getPrefix("http");
+		this.sendGauge(prefix, "current_open", httpStats.getServerOpen());
+		this.sendGauge(prefix, "total_opened", httpStats.getTotalOpen());
 	}
 
 	private void sendNodeFsStats(FsStats fs) {
 		// Send total
-		String type = this.getPrefix("fs");
-		this.sendNodeFsStatsInfo(type + ".total", fs.total());
+		String prefix = this.getPrefix("fs");
+		this.sendNodeFsStatsInfo(prefix + ".total", fs.total());
 
 		// Maybe send details
 		if (this.statsdReportFsDetails) {
 			Iterator<FsStats.Info> infoIterator = fs.iterator();
 			while (infoIterator.hasNext()) {
 				FsStats.Info info = infoIterator.next();
-				this.sendNodeFsStatsInfo(type + ".data", info);
+				this.sendNodeFsStatsInfo(prefix + ".data", info);
 			}
 		}
 	}
 
-	private void sendNodeFsStatsInfo(String type, FsStats.Info info) {
+	private void sendNodeFsStatsInfo(String prefix, FsStats.Info info) {
 		// Construct detailed path
-		String typeAppend = "";
+		String prefixAppend = "";
 		if (info.getPath() != null)
-			typeAppend += "." + info.getPath();
+			prefixAppend += "." + info.getPath();
 		if (info.getMount() != null)
-			typeAppend += "." + info.getMount();
+			prefixAppend += "." + info.getMount();
 		if (info.getDev() != null)
-			typeAppend += "." + info.getDev();
+			prefixAppend += "." + info.getDev();
 
 		if (info.getAvailable().bytes() != -1)
-			this.sendGauge(type + typeAppend, "available_in_bytes", info.getAvailable().bytes());
+			this.sendGauge(prefix + prefixAppend, "available_in_bytes", info.getAvailable().bytes());
 		if (info.getTotal().bytes() != -1)
-			this.sendGauge(type + typeAppend, "total_in_bytes", info.getTotal().bytes());
+			this.sendGauge(prefix + prefixAppend, "total_in_bytes", info.getTotal().bytes());
 		if (info.getFree().bytes() != -1)
-			this.sendGauge(type + typeAppend, "free_in_bytes", info.getFree().bytes());
+			this.sendGauge(prefix + prefixAppend, "free_in_bytes", info.getFree().bytes());
 
 		// disk_io_op is sum of reads and writes (use graphite functions)
 		if (info.getDiskReads() != -1)
-			this.sendGauge(type + typeAppend, "disk_reads", info.getDiskReads());
+			this.sendGauge(prefix + prefixAppend, "disk_reads", info.getDiskReads());
 		if (info.getDiskWrites() != -1)
-			this.sendGauge(type + typeAppend, "disk_writes", info.getDiskWrites());
+			this.sendGauge(prefix + prefixAppend, "disk_writes", info.getDiskWrites());
 
 		// disk_io_size_in_bytes is sum of reads and writes (use graphite functions)
 		if (info.getDiskReadSizeInBytes() != -1)
-			this.sendGauge(type + typeAppend, "disk_read_size_in_bytes", info.getDiskReadSizeInBytes());
+			this.sendGauge(prefix + prefixAppend, "disk_read_size_in_bytes", info.getDiskReadSizeInBytes());
 		if (info.getDiskWriteSizeInBytes() != -1)
-			this.sendGauge(type + typeAppend, "disk_write_size_in_bytes", info.getDiskWriteSizeInBytes());
+			this.sendGauge(prefix + prefixAppend, "disk_write_size_in_bytes", info.getDiskWriteSizeInBytes());
 
 		/** TODO: Find out if these stats are useful.
 		if (info.getDiskQueue() != -1)
-			this.sendGauge(type + typeAppend, "disk_queue", (long) info.getDiskQueue());
+			this.sendGauge(prefix + prefixAppend, "disk_queue", (long) info.getDiskQueue());
 		if (info.getDiskServiceTime() != -1)
-			this.sendGauge(type + typeAppend, "disk_service_time", (long) info.getDiskServiceTime());
+			this.sendGauge(prefix + prefixAppend, "disk_service_time", (long) info.getDiskServiceTime());
 		*/
 	}
 
