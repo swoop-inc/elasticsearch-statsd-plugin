@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.spinscale.elasticsearch</groupId>
 	<artifactId>elasticsearch-statsd</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>Statsd monitoring plugin for Elasticsearch</description>
 	<url>https://github.com/swoop-inc/elasticsearch-statsd-plugin/</url>
