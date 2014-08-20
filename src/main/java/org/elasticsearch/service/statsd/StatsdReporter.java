@@ -22,6 +22,10 @@ public abstract class StatsdReporter {
 		this.statsdClient.gauge(this.join(name, valueName), value);
 	}
 
+	protected void sendGauge(String name, String valueName, double value) {
+		this.statsdClient.gauge(this.join(name, valueName), value);
+	}
+
 	protected void sendCount(String name, String valueName, long value) {
 		this.statsdClient.count(this.join(name, valueName), value);
 	}

@@ -89,13 +89,11 @@ public class StatsdReporterNodeStats extends StatsdReporter {
 	private void sendNodeOsStats(OsStats osStats) {
 		String prefix = this.getPrefix("os");
 
-		// Java client does not support doubles yet :(
-		// https://github.com/tim-group/java-statsd-client/issues/19
 		double[] loadAverage = osStats.getLoadAverage();
 		if (loadAverage.length > 0) {
-			this.sendGauge(prefix + ".load_average", "1m", (long) loadAverage[0]);
-			this.sendGauge(prefix + ".load_average", "5m", (long) loadAverage[1]);
-			this.sendGauge(prefix + ".load_average", "15m", (long) loadAverage[2]);
+			this.sendGauge(prefix + ".load_average", "1m", loadAverage[0]);
+			this.sendGauge(prefix + ".load_average", "5m", loadAverage[1]);
+			this.sendGauge(prefix + ".load_average", "15m", loadAverage[2]);
 		}
 
 		if (osStats.cpu() != null) {
