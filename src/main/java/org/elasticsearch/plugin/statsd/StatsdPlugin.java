@@ -17,7 +17,7 @@ public class StatsdPlugin extends AbstractPlugin
 
 	public String description()
 	{
-		return "Statsd Monitoring Plugin";
+		return "StatsD Monitoring Plugin";
 	}
 
 	@SuppressWarnings("rawtypes")
