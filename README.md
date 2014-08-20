@@ -64,7 +64,7 @@ This plugin reports both node level and cluster level stats, the StatsD keys wil
 
 ## Credits
 
-This is a fork of the Swoop plugin (swoop-inc/elasticsearch-statsd-plugin@beeca78240) for multi node clusters on ES 1.x.
+This is a fork of the [Swoop plugin](https://github.com/swoop-inc/elasticsearch-statsd-plugin) for multi-node clusters on ES 1.x.
 
 Heavily inspired by the excellent [metrics library](http://metrics.codahale.com) by Coda Hale and its [GraphiteReporter add-on](http://metrics.codahale.com/manual/graphite/).
 
