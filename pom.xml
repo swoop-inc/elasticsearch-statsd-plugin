@@ -6,21 +6,22 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.spinscale.elasticsearch</groupId>
 	<artifactId>elasticsearch-statsd</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.3.3</version>
 	<packaging>jar</packaging>
-	<description>Statsd monitoring plugin for Elasticsearch</description>
-	<url>https://github.com/swoop-inc/elasticsearch-statsd-plugin/</url>
+	<description>StatsD monitoring plugin for Elasticsearch</description>
+	<url>https://github.com/Automattic/elasticsearch-statsd-plugin/</url>
 
 	<properties>
-		<elasticsearch.version>0.90.3</elasticsearch.version>
+		<elasticsearch.version>1.0.1</elasticsearch.version>
 		<hamcrest.version>1.3</hamcrest.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.timgroup</groupId>
 			<artifactId>java-statsd-client</artifactId>
-			<version>2.0.0</version>
+			<version>3.0.2</version>
 		</dependency>
 
 		<dependency>
