@@ -50,13 +50,13 @@ public abstract class StatsdReporter {
 		for (int i = 0; i < parts.length; i++) {
 			builder.append(parts[i]);
 			if (i < parts.length - 1) {
-				builder.append(this.DEFAULT_JOINER);
+				builder.append(DEFAULT_JOINER);
 			}
 		}
 		return builder.toString();
 	}
 
 	protected void logException(Exception e) {
-		this.logger.warn("Error writing to StatsD", e);
+		logger.warn("Error writing to StatsD", e);
 	}
 }

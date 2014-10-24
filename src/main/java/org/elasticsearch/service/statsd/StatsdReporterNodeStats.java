@@ -1,13 +1,10 @@
 package org.elasticsearch.service.statsd;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
 import org.elasticsearch.monitor.fs.FsStats;
 import org.elasticsearch.monitor.jvm.JvmStats;
-import org.elasticsearch.monitor.jvm.JvmStats.GarbageCollector;
 import org.elasticsearch.monitor.network.NetworkStats;
 import org.elasticsearch.monitor.os.OsStats;
 import org.elasticsearch.monitor.process.ProcessStats;
